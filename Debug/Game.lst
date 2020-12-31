@@ -1,0 +1,1853 @@
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 29-Dec-2020 03:00:29  PAGE    1
+
+************ OBJECT LISTING ************
+
+FILE NAME: E:\Entwicklung\Casio\SDK\Minesweeper\Game.c
+
+SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
+
+          Game.c     1    #include "Game.h"
+          Game.c     2    #include "fxlib.h"
+          Game.c     3    #include "digits.h"
+          Game.c     4    #include "Graphics.h"
+          Game.c     5    #include <stdio.h>
+          Game.c     6    #include "Menu.h"
+          Game.c     7    
+          Game.c     8    #define FIELD_MINE (1<<0)
+          Game.c     9    #define FIELD_COVERED (1<<1)
+          Game.c    10    #define FIELD_FLAGGED (1<<2)
+          Game.c    11    #define FIELD_MINES_1 (1<<3)
+          Game.c    12    #define FIELD_MINES_2 (1<<4)
+          Game.c    13    #define FIELD_MINES_3 (1<<5)
+          Game.c    14    
+          Game.c    15    int indexOf(int x, int y)
+P   00000000              _indexOf:                        ; function: indexOf
+                                                           ; frame size=0
+          Game.c    16    {
+          Game.c    17        return y * FWIDTH + x;
+    00000000 6053                   MOV         R5,R0
+    00000002 4008                   SHLL2       R0
+    00000004 4008                   SHLL2       R0
+          Game.c    18    }
+    00000006 000B                   RTS
+    00000008 304C                   ADD         R4,R0
+          Game.c    19    
+          Game.c    20    uchar _isFlagged(int x, int y, uchar *field)
+    0000000A              __isFlagged:                     ; function: _isFlagged
+                                                           ; frame size=8
+    0000000A 4F22                   STS.L       PR,@-R15
+    0000000C 7FFC                   ADD         #-4,R15
+          Game.c    21    {
+          Game.c    22        int i = indexOf(x,y);
+    0000000E BFF7                   BSR         _indexOf
+    00000010 2F62                   MOV.L       R6,@R15
+    00000012 6403                   MOV         R0,R4
+          Game.c    23        return field[i] & FIELD_FLAGGED;
+    00000014 60F2                   MOV.L       @R15,R0
+    00000016 E204                   MOV         #4,R2
+    00000018 034C                   MOV.B       @(R0,R4),R3
+          Game.c    24    }
+    0000001A 7F04                   ADD         #4,R15
+    0000001C 4F26                   LDS.L       @R15+,PR
+    0000001E 2329                   AND         R2,R3
+    00000020 000B                   RTS
+    00000022 6033                   MOV         R3,R0
+          Game.c    25    
+          Game.c    26    uchar _isCovered(int x, int y, uchar *field)
+    00000024              __isCovered:                     ; function: _isCovered
+                                                           ; frame size=8
+    00000024 4F22                   STS.L       PR,@-R15
+    00000026 7FFC                   ADD         #-4,R15
+          Game.c    27    {
+          Game.c    28        int i = indexOf(x,y);
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 29-Dec-2020 03:00:29  PAGE    2
+
+
+SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
+
+    00000028 BFEA                   BSR         _indexOf
+    0000002A 2F62                   MOV.L       R6,@R15
+    0000002C 6403                   MOV         R0,R4
+          Game.c    29        return field[i] & FIELD_COVERED;
+    0000002E E202                   MOV         #2,R2
+    00000030 60F2                   MOV.L       @R15,R0
+    00000032 034C                   MOV.B       @(R0,R4),R3
+    00000034 2329                   AND         R2,R3
+          Game.c    30    }
+    00000036 7F04                   ADD         #4,R15
+    00000038 4F26                   LDS.L       @R15+,PR
+    0000003A 000B                   RTS
+    0000003C 6033                   MOV         R3,R0
+          Game.c    31    
+          Game.c    32    uchar _isMined(int x, int y, uchar *field)
+    0000003E              __isMined:                       ; function: _isMined
+                                                           ; frame size=16
+    0000003E 2FE6                   MOV.L       R14,@-R15
+    00000040 2FD6                   MOV.L       R13,@-R15
+    00000042 6E53                   MOV         R5,R14
+    00000044 4F22                   STS.L       PR,@-R15
+    00000046 6D43                   MOV         R4,R13
+    00000048 7FFC                   ADD         #-4,R15
+          Game.c    33    {
+          Game.c    34        int i = indexOf(x,y);
+    0000004A 65E3                   MOV         R14,R5
+    0000004C 2F62                   MOV.L       R6,@R15
+    0000004E BFD7                   BSR         _indexOf
+    00000050 64D3                   MOV         R13,R4
+          Game.c    35        if(x < 0 || y < 0 || x >= FWIDTH || y >= FHEIGHT) return FALSE;
+    00000052 4D11                   CMP/PZ      R13
+    00000054 8F08                   BF/S        L513
+    00000056 6403                   MOV         R0,R4
+    00000058 4E11                   CMP/PZ      R14
+    0000005A 8B05                   BF          L513
+    0000005C E210                   MOV         #16,R2
+    0000005E 3D23                   CMP/GE      R2,R13
+    00000060 8902                   BT          L513
+    00000062 E108                   MOV         #8,R1
+    00000064 3E13                   CMP/GE      R1,R14
+    00000066 8B01                   BF          L512
+    00000068              L513:                             
+    00000068 A005                   BRA         L514
+    0000006A E000                   MOV         #0,R0
+    0000006C              L512:                             
+          Game.c    36        return field[i] & FIELD_MINE;
+    0000006C 60F2                   MOV.L       @R15,R0
+    0000006E E201                   MOV         #1,R2
+    00000070 034C                   MOV.B       @(R0,R4),R3
+    00000072 2329                   AND         R2,R3
+    00000074 6033                   MOV         R3,R0
+          Game.c    37    }
+    00000076              L514:                             
+    00000076 7F04                   ADD         #4,R15
+    00000078 4F26                   LDS.L       @R15+,PR
+    0000007A 6DF6                   MOV.L       @R15+,R13
+    0000007C 000B                   RTS
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 29-Dec-2020 03:00:29  PAGE    3
+
+
+SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
+
+    0000007E 6EF6                   MOV.L       @R15+,R14
+          Game.c    38    
+          Game.c    39    void _setFlagged(int x, int y, uchar *field, uchar flagged)
+    00000080              __setFlagged:                    ; function: _setFlagged
+                                                           ; frame size=12
+    00000080 4F22                   STS.L       PR,@-R15
+    00000082 7FF8                   ADD         #-8,R15
+    00000084 1F61                   MOV.L       R6,@(4,R15)
+          Game.c    40    {
+          Game.c    41        int i = indexOf(x,y);
+    00000086 BFBB                   BSR         _indexOf
+    00000088 2F70                   MOV.B       R7,@R15
+    0000008A 6503                   MOV         R0,R5
+    0000008C 54F1                   MOV.L       @(4,R15),R4
+    0000008E 63F0                   MOV.B       @R15,R3
+    00000090 2338                   TST         R3,R3
+    00000092 8D03                   BT/S        L515
+    00000094 345C                   ADD         R5,R4
+          Game.c    42        if(flagged)
+          Game.c    43            field[i] |= FIELD_FLAGGED;
+    00000096 6040                   MOV.B       @R4,R0
+    00000098 A002                   BRA         L592
+    0000009A CB04                   OR          #4,R0
+    0000009C              L515:                             
+          Game.c    44        else
+          Game.c    45            field[i] &= ~FIELD_FLAGGED;
+    0000009C 6040                   MOV.B       @R4,R0
+    0000009E C9FB                   AND         #251,R0
+    000000A0              L592:                             
+    000000A0 2400                   MOV.B       R0,@R4
+          Game.c    46    }
+    000000A2 7F08                   ADD         #8,R15
+    000000A4 4F26                   LDS.L       @R15+,PR
+    000000A6 000B                   RTS
+    000000A8 0009                   NOP
+          Game.c    47    
+          Game.c    48    uchar _getNaigbouringMines(uchar* field, uchar x, uchar y)
+    000000AA              __getNaigbouringMines:           ; function: _getNaigbouringMines
+                                                           ; frame size=16
+    000000AA 6053                   MOV         R5,R0
+    000000AC 4F22                   STS.L       PR,@-R15
+    000000AE 7FF4                   ADD         #-12,R15
+    000000B0 2F42                   MOV.L       R4,@R15
+    000000B2 80F4                   MOV.B       R0,@(4,R15)
+    000000B4 6063                   MOV         R6,R0
+    000000B6 80F8                   MOV.B       R0,@(8,R15)
+          Game.c    49    {
+          Game.c    50        uchar i = indexOf(x,y);
+    000000B8 84F8                   MOV.B       @(8,R15),R0
+    000000BA 6503                   MOV         R0,R5
+    000000BC 84F4                   MOV.B       @(4,R15),R0
+    000000BE 655C                   EXTU.B      R5,R5
+    000000C0 6403                   MOV         R0,R4
+    000000C2 BF9D                   BSR         _indexOf
+    000000C4 644C                   EXTU.B      R4,R4
+          Game.c    51        return (field[i] >> 3) & 7;//0b111;
+    000000C6 640C                   EXTU.B      R0,R4
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 29-Dec-2020 03:00:29  PAGE    4
+
+
+SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
+
+    000000C8 60F2                   MOV.L       @R15,R0
+    000000CA E207                   MOV         #7,R2
+    000000CC 034C                   MOV.B       @(R0,R4),R3
+          Game.c    52    }
+    000000CE 7F0C                   ADD         #12,R15
+    000000D0 4F26                   LDS.L       @R15+,PR
+    000000D2 633C                   EXTU.B      R3,R3
+    000000D4 4309                   SHLR2       R3
+    000000D6 4301                   SHLR        R3
+    000000D8 2329                   AND         R2,R3
+    000000DA 000B                   RTS
+    000000DC 6033                   MOV         R3,R0
+          Game.c    53    
+          Game.c    54    void _setNaigbouringMines(uchar* field, uchar x, uchar y, uchar val)
+    000000DE              __setNaigbouringMines:           ; function: _setNaigbouringMines
+                                                           ; frame size=20
+    000000DE 6063                   MOV         R6,R0
+    000000E0 4F22                   STS.L       PR,@-R15
+    000000E2 7FF0                   ADD         #-16,R15
+    000000E4 1F42                   MOV.L       R4,@(8,R15)
+    000000E6 2F50                   MOV.B       R5,@R15
+    000000E8 80FC                   MOV.B       R0,@(12,R15)
+    000000EA 6073                   MOV         R7,R0
+    000000EC 80F4                   MOV.B       R0,@(4,R15)
+          Game.c    55    {
+          Game.c    56        uchar i = indexOf(x,y);
+    000000EE 84FC                   MOV.B       @(12,R15),R0
+    000000F0 64F0                   MOV.B       @R15,R4
+    000000F2 6503                   MOV         R0,R5
+    000000F4 655C                   EXTU.B      R5,R5
+    000000F6 BF83                   BSR         _indexOf
+    000000F8 644C                   EXTU.B      R4,R4
+    000000FA 6403                   MOV         R0,R4
+          Game.c    57        uchar v = (val & 7) << 3;
+          Game.c    58        field[i] &= ~56;//0b111000;
+    000000FC 53F2                   MOV.L       @(8,R15),R3
+    000000FE E507                   MOV         #7,R5
+    00000100 84F4                   MOV.B       @(4,R15),R0
+    00000102 664C                   EXTU.B      R4,R6
+    00000104 600C                   EXTU.B      R0,R0
+    00000106 2509                   AND         R0,R5
+    00000108 4508                   SHLL2       R5
+    0000010A 4500                   SHLL        R5
+    0000010C 363C                   ADD         R3,R6
+    0000010E 6060                   MOV.B       @R6,R0
+    00000110 C9C7                   AND         #199,R0
+    00000112 2600                   MOV.B       R0,@R6
+          Game.c    59        field[i] |= v;
+    00000114 6360                   MOV.B       @R6,R3
+    00000116 235B                   OR          R5,R3
+    00000118 2630                   MOV.B       R3,@R6
+          Game.c    60    }
+    0000011A 7F10                   ADD         #16,R15
+    0000011C 4F26                   LDS.L       @R15+,PR
+    0000011E 000B                   RTS
+    00000120 0009                   NOP
+          Game.c    61    
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 29-Dec-2020 03:00:29  PAGE    5
+
+
+SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
+
+          Game.c    62    uchar _uncover(uchar* field, uchar x, uchar y)
+    00000122              __uncover:                       ; function: _uncover
+                                                           ; frame size=36
+    00000122 2FE6                   MOV.L       R14,@-R15
+    00000124 2FD6                   MOV.L       R13,@-R15
+    00000126 6E43                   MOV         R4,R14
+    00000128 2FC6                   MOV.L       R12,@-R15
+    0000012A 6D63                   MOV         R6,R13
+    0000012C 2FB6                   MOV.L       R11,@-R15
+    0000012E 6C53                   MOV         R5,R12
+    00000130 2FA6                   MOV.L       R10,@-R15
+          Game.c    63    {
+          Game.c    64        uchar mineCount;
+          Game.c    65        int i = indexOf(x, y);
+    00000132 6BDC                   EXTU.B      R13,R11
+    00000134 2F96                   MOV.L       R9,@-R15
+    00000136 6ACC                   EXTU.B      R12,R10
+    00000138 2F86                   MOV.L       R8,@-R15
+    0000013A 65B3                   MOV         R11,R5
+    0000013C 4F22                   STS.L       PR,@-R15
+    0000013E 7FFC                   ADD         #-4,R15
+    00000140 BF5E                   BSR         _indexOf
+    00000142 64A3                   MOV         R10,R4
+          Game.c    66    
+          Game.c    67        if(x < 0 || y < 0 || x >= FWIDTH || y >= FHEIGHT) return 0;
+    00000144 4A11                   CMP/PZ      R10
+    00000146 8F50                   BF/S        L493
+    00000148 2F02                   MOV.L       R0,@R15
+    0000014A 4B11                   CMP/PZ      R11
+    0000014C 8B4D                   BF          L493
+    0000014E E310                   MOV         #16,R3
+    00000150 3A33                   CMP/GE      R3,R10
+    00000152 894A                   BT          L493
+    00000154 E108                   MOV         #8,R1
+    00000156 3B13                   CMP/GE      R1,R11
+    00000158 8947                   BT          L493
+          Game.c    68        if(!_isCovered(x, y, field)) return 0;
+    0000015A 66E3                   MOV         R14,R6
+    0000015C 65B3                   MOV         R11,R5
+    0000015E BF61                   BSR         __isCovered
+    00000160 64A3                   MOV         R10,R4
+    00000162 600C                   EXTU.B      R0,R0
+    00000164 2008                   TST         R0,R0
+    00000166 8940                   BT          L493
+          Game.c    69        if(_isFlagged(x, y, field)) return 0;
+    00000168 66E3                   MOV         R14,R6
+    0000016A 65B3                   MOV         R11,R5
+    0000016C BF4D                   BSR         __isFlagged
+    0000016E 64A3                   MOV         R10,R4
+    00000170 600C                   EXTU.B      R0,R0
+    00000172 2008                   TST         R0,R0
+    00000174 8B39                   BF          L493
+    00000176 64F2                   MOV.L       @R15,R4
+    00000178 34EC                   ADD         R14,R4
+    0000017A 6040                   MOV.B       @R4,R0
+    0000017C 600C                   EXTU.B      R0,R0
+    0000017E C801                   TST         #1,R0
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 29-Dec-2020 03:00:29  PAGE    6
+
+
+SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
+
+    00000180 8901                   BT          L523
+          Game.c    70    
+          Game.c    71        if(field[i] & FIELD_MINE)
+          Game.c    72        {
+          Game.c    73            return 1;
+    00000182 A033                   BRA         L520
+    00000184 E001                   MOV         #1,R0
+    00000186              L523:                             
+          Game.c    74        }
+          Game.c    75    
+          Game.c    76        field[i] &= ~ FIELD_COVERED;
+          Game.c    77    
+          Game.c    78        mineCount = _getNaigbouringMines(field, x, y);
+    00000186 66D3                   MOV         R13,R6
+    00000188 6040                   MOV.B       @R4,R0
+    0000018A 65C3                   MOV         R12,R5
+    0000018C C9FD                   AND         #253,R0
+    0000018E 2400                   MOV.B       R0,@R4
+    00000190 BF8B                   BSR         __getNaigbouringMines
+    00000192 64E3                   MOV         R14,R4
+          Game.c    79        if(mineCount == 0)
+    00000194 640C                   EXTU.B      R0,R4
+    00000196 2448                   TST         R4,R4
+    00000198 8B27                   BF          L493
+          Game.c    80        {
+          Game.c    81            _uncover(field, x-1,y-1);
+    0000019A 988F                   MOV.W       L595,R8    ; H'00FF
+    0000019C 9B8E                   MOV.W       L595,R11   ; H'00FF
+    0000019E 38DC                   ADD         R13,R8
+    000001A0 6683                   MOV         R8,R6
+    000001A2 3BCC                   ADD         R12,R11
+    000001A4 65B3                   MOV         R11,R5
+    000001A6 BFBC                   BSR         __uncover
+    000001A8 64E3                   MOV         R14,R4
+          Game.c    82            _uncover(field, x+1,y-1);
+    000001AA 6683                   MOV         R8,R6
+    000001AC 6AC3                   MOV         R12,R10
+    000001AE 7A01                   ADD         #1,R10
+    000001B0 65A3                   MOV         R10,R5
+    000001B2 BFB6                   BSR         __uncover
+    000001B4 64E3                   MOV         R14,R4
+          Game.c    83            _uncover(field, x-1,y+1);
+    000001B6 69D3                   MOV         R13,R9
+    000001B8 7901                   ADD         #1,R9
+    000001BA 6693                   MOV         R9,R6
+    000001BC 65B3                   MOV         R11,R5
+    000001BE BFB0                   BSR         __uncover
+    000001C0 64E3                   MOV         R14,R4
+          Game.c    84            _uncover(field, x+1,y+1);
+    000001C2 6693                   MOV         R9,R6
+    000001C4 65A3                   MOV         R10,R5
+    000001C6 BFAC                   BSR         __uncover
+    000001C8 64E3                   MOV         R14,R4
+          Game.c    85            _uncover(field, x-1,y);
+    000001CA 66D3                   MOV         R13,R6
+    000001CC 65B3                   MOV         R11,R5
+    000001CE BFA8                   BSR         __uncover
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 29-Dec-2020 03:00:29  PAGE    7
+
+
+SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
+
+    000001D0 64E3                   MOV         R14,R4
+          Game.c    86            _uncover(field, x+1,y);
+    000001D2 66D3                   MOV         R13,R6
+    000001D4 65A3                   MOV         R10,R5
+    000001D6 BFA4                   BSR         __uncover
+    000001D8 64E3                   MOV         R14,R4
+          Game.c    87            _uncover(field, x,y-1);
+    000001DA 6683                   MOV         R8,R6
+    000001DC 65C3                   MOV         R12,R5
+    000001DE BFA0                   BSR         __uncover
+    000001E0 64E3                   MOV         R14,R4
+          Game.c    88            _uncover(field, x,y+1);
+    000001E2 6693                   MOV         R9,R6
+    000001E4 65C3                   MOV         R12,R5
+    000001E6 BF9C                   BSR         __uncover
+    000001E8 64E3                   MOV         R14,R4
+    000001EA              L493:
+          Game.c    89        }
+          Game.c    90    
+          Game.c    91        return 0;
+    000001EA E000                   MOV         #0,R0
+          Game.c    92    }
+    000001EC              L520:                             
+    000001EC 7F04                   ADD         #4,R15
+    000001EE 4F26                   LDS.L       @R15+,PR
+    000001F0 68F6                   MOV.L       @R15+,R8
+    000001F2 69F6                   MOV.L       @R15+,R9
+    000001F4 6AF6                   MOV.L       @R15+,R10
+    000001F6 6BF6                   MOV.L       @R15+,R11
+    000001F8 6CF6                   MOV.L       @R15+,R12
+    000001FA 6DF6                   MOV.L       @R15+,R13
+    000001FC 000B                   RTS
+    000001FE 6EF6                   MOV.L       @R15+,R14
+          Game.c    93    
+          Game.c    94    void _drawField(uchar *field, int selectionX, int selectionY)
+    00000200              __drawField:                     ; function: _drawField
+                                                           ; frame size=76
+    00000200 2FE6                   MOV.L       R14,@-R15
+    00000202 2FD6                   MOV.L       R13,@-R15
+    00000204 2FC6                   MOV.L       R12,@-R15
+    00000206 2FB6                   MOV.L       R11,@-R15
+    00000208 2FA6                   MOV.L       R10,@-R15
+    0000020A 2F96                   MOV.L       R9,@-R15
+    0000020C 2F86                   MOV.L       R8,@-R15
+          Game.c    95    {
+          Game.c    96        int i, j, k;
+          Game.c    97        uchar *digit;
+          Game.c    98        DISPBOX dispbox;
+          Game.c    99    
+          Game.c   100        for(i = 0; i < FWIDTH; i++)
+    0000020E E800                   MOV         #0,R8
+    00000210 4F22                   STS.L       PR,@-R15
+    00000212 6A83                   MOV         R8,R10
+    00000214 7FD8                   ADD         #-40,R15
+    00000216 6BF3                   MOV         R15,R11
+    00000218 2F42                   MOV.L       R4,@R15
+    0000021A 7B18                   ADD         #24,R11
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 29-Dec-2020 03:00:29  PAGE    8
+
+
+SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
+
+    0000021C 1F55                   MOV.L       R5,@(20,R15)
+    0000021E 1F64                   MOV.L       R6,@(16,R15)
+    00000220              L525:                             
+          Game.c   101        {
+          Game.c   102            for(j = 0; j < FHEIGHT; j++)
+    00000220 6D83                   MOV         R8,R13
+    00000222 6EA3                   MOV         R10,R14
+    00000224 4E08                   SHLL2       R14
+    00000226 4E00                   SHLL        R14
+    00000228 60A3                   MOV         R10,R0
+    0000022A 4008                   SHLL2       R0
+    0000022C 4000                   SHLL        R0
+    0000022E 80FC                   MOV.B       R0,@(12,R15)
+    00000230              L526:                             
+          Game.c   103            {
+          Game.c   104                dispbox.left = i * TSIZE;
+    00000230 2BE2                   MOV.L       R14,@R11
+          Game.c   105                dispbox.top = j * TSIZE;
+    00000232 6CD3                   MOV         R13,R12
+    00000234 4C08                   SHLL2       R12
+    00000236 4C00                   SHLL        R12
+    00000238 1BC1                   MOV.L       R12,@(4,R11)
+          Game.c   106                dispbox.right = dispbox.left + TSIZE;
+          Game.c   107                dispbox.bottom = dispbox.top + TSIZE;
+          Game.c   108                //Bdisp_AreaClr_DDVRAM(&dispbox);
+          Game.c   109                FillRect(i*TSIZE,j*TSIZE,TSIZE,TSIZE,0);
+    0000023A E708                   MOV         #8,R7
+    0000023C 63B2                   MOV.L       @R11,R3
+    0000023E 65D3                   MOV         R13,R5
+    00000240 7308                   ADD         #8,R3
+    00000242 6673                   MOV         R7,R6
+    00000244 1B32                   MOV.L       R3,@(8,R11)
+    00000246 4508                   SHLL2       R5
+    00000248 52B1                   MOV.L       @(4,R11),R2
+    0000024A E010                   MOV         #16,R0
+    0000024C D31C                   MOV.L       L595+4,R3  ; _FillRect
+    0000024E 4500                   SHLL        R5
+    00000250 7208                   ADD         #8,R2
+    00000252 1B23                   MOV.L       R2,@(12,R11)
+    00000254 2F86                   MOV.L       R8,@-R15
+    00000256 430B                   JSR         @R3
+    00000258 04FC                   MOV.B       @(R0,R15),R4
+    0000025A 7F04                   ADD         #4,R15
+          Game.c   110                SetPoint(i * TSIZE, j * TSIZE);
+    0000025C D219                   MOV.L       L595+8,R2  ; _SetPoint
+    0000025E 65C3                   MOV         R12,R5
+    00000260 420B                   JSR         @R2
+    00000262 64E3                   MOV         R14,R4
+          Game.c   111                if(_isCovered(i, j, field))
+    00000264 66F2                   MOV.L       @R15,R6
+    00000266 65D3                   MOV         R13,R5
+    00000268 BEDC                   BSR         __isCovered
+    0000026A 64A3                   MOV         R10,R4
+    0000026C 600C                   EXTU.B      R0,R0
+    0000026E 2008                   TST         R0,R0
+    00000270 894A                   BT          L527
+          Game.c   112                {
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 29-Dec-2020 03:00:29  PAGE    9
+
+
+SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
+
+          Game.c   113                    if(_isFlagged(i, j, field))
+    00000272 65D3                   MOV         R13,R5
+    00000274 66F2                   MOV.L       @R15,R6
+    00000276 BEC8                   BSR         __isFlagged
+    00000278 64A3                   MOV         R10,R4
+    0000027A 600C                   EXTU.B      R0,R0
+    0000027C 2008                   TST         R0,R0
+    0000027E 8904                   BT          L528
+          Game.c   114                    {
+          Game.c   115                        digit = GetDigit(ICON_FLAG);
+    00000280 D311                   MOV.L       L595+12,R3 ; _GetDigit
+    00000282 430B                   JSR         @R3
+    00000284 E40A                   MOV         #10,R4
+          Game.c   116                        DrawDigit(i*TSIZE,j*TSIZE,digit);
+    00000286 A049                   BRA         L593
+    00000288 0009                   NOP
+    0000028A              L528:                             
+          Game.c   117                    }
+          Game.c   118                    else
+          Game.c   119                    {
+          Game.c   120                        for(k = 0; k < (TSIZE*TSIZE); k++)
+    0000028A 6983                   MOV         R8,R9
+    0000028C              L530:                             
+          Game.c   121                        {
+          Game.c   122                            int x = k%TSIZE;
+    0000028C 6093                   MOV         R9,R0
+    0000028E 4011                   CMP/PZ      R0
+    00000290 8B01                   BF          L531
+    00000292 A005                   BRA         L532
+    00000294 C907                   AND         #7,R0
+    00000296              L531:                             
+    00000296 6007                   NOT         R0,R0
+    00000298 7001                   ADD         #1,R0
+    0000029A C907                   AND         #7,R0
+    0000029C 6007                   NOT         R0,R0
+    0000029E 7001                   ADD         #1,R0
+    000002A0              L532:                             
+          Game.c   123                            int y = k/TSIZE;
+    000002A0 6393                   MOV         R9,R3
+    000002A2 4311                   CMP/PZ      R3
+    000002A4 8D01                   BT/S        L533
+    000002A6 1F01                   MOV.L       R0,@(4,R15)
+    000002A8 7307                   ADD         #7,R3
+    000002AA              L533:                             
+    000002AA 4321                   SHAR        R3
+    000002AC 4321                   SHAR        R3
+    000002AE 4321                   SHAR        R3
+    000002B0 1F32                   MOV.L       R3,@(8,R15)
+          Game.c   124                            if(x%2 == y%2)
+    000002B2 50F1                   MOV.L       @(4,R15),R0
+    000002B4 4011                   CMP/PZ      R0
+    000002B6 8B09                   BF          L535
+    000002B8 A00D                   BRA         L536
+    000002BA C901                   AND         #1,R0
+    000002BC              L595:                             
+    000002BC 00FF                   .DATA.W     H'00FF
+    000002BE 0000                   .DATA.W     0
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 29-Dec-2020 03:00:29  PAGE   10
+
+
+SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
+
+    000002C0 <00000000>             .DATA.L     _FillRect
+    000002C4 <00000000>             .DATA.L     _SetPoint
+    000002C8 <00000000>             .DATA.L     _GetDigit
+    000002CC              L535:                             
+    000002CC 6007                   NOT         R0,R0
+    000002CE 7001                   ADD         #1,R0
+    000002D0 C901                   AND         #1,R0
+    000002D2 6007                   NOT         R0,R0
+    000002D4 7001                   ADD         #1,R0
+    000002D6              L536:                             
+    000002D6 6203                   MOV         R0,R2
+    000002D8 6033                   MOV         R3,R0
+    000002DA 4011                   CMP/PZ      R0
+    000002DC 8B01                   BF          L537
+    000002DE A005                   BRA         L538
+    000002E0 C901                   AND         #1,R0
+    000002E2              L537:                             
+    000002E2 6007                   NOT         R0,R0
+    000002E4 7001                   ADD         #1,R0
+    000002E6 C901                   AND         #1,R0
+    000002E8 6007                   NOT         R0,R0
+    000002EA 7001                   ADD         #1,R0
+    000002EC              L538:                             
+    000002EC 3200                   CMP/EQ      R0,R2
+    000002EE 8B05                   BF          L534
+          Game.c   125                                SetPoint(i*TSIZE+x, j*TSIZE+y);
+    000002F0 54F1                   MOV.L       @(4,R15),R4
+    000002F2 65C3                   MOV         R12,R5
+    000002F4 D286                   MOV.L       L596+2,R2  ; _SetPoint
+    000002F6 353C                   ADD         R3,R5
+    000002F8 420B                   JSR         @R2
+    000002FA 34EC                   ADD         R14,R4
+    000002FC              L534:                             
+    000002FC 7901                   ADD         #1,R9
+    000002FE E340                   MOV         #64,R3
+    00000300 3933                   CMP/GE      R3,R9
+    00000302 8BC3                   BF          L530
+    00000304 A021                   BRA         L539
+    00000306 0009                   NOP
+    00000308              L527:                             
+          Game.c   126                        }
+          Game.c   127                    }
+          Game.c   128                }
+          Game.c   129                else
+          Game.c   130                {
+          Game.c   131                    if(_isMined(i,j,field))
+    00000308 66F2                   MOV.L       @R15,R6
+    0000030A 65D3                   MOV         R13,R5
+    0000030C BE97                   BSR         __isMined
+    0000030E 64A3                   MOV         R10,R4
+    00000310 600C                   EXTU.B      R0,R0
+    00000312 2008                   TST         R0,R0
+    00000314 8909                   BT          L540
+          Game.c   132                    {
+          Game.c   133                        digit = GetDigit(ICON_MINE);
+    00000316 D37F                   MOV.L       L596+6,R3  ; _GetDigit
+    00000318 430B                   JSR         @R3
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 29-Dec-2020 03:00:29  PAGE   11
+
+
+SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
+
+    0000031A E40B                   MOV         #11,R4
+          Game.c   134                        DrawDigit(i*TSIZE,j*TSIZE,digit);
+    0000031C              L593:                             
+    0000031C D27E                   MOV.L       L596+10,R2 ; _DrawDigit
+    0000031E 6603                   MOV         R0,R6
+    00000320 65C3                   MOV         R12,R5
+    00000322 420B                   JSR         @R2
+    00000324 64E3                   MOV         R14,R4
+    00000326 A010                   BRA         L539
+    00000328 0009                   NOP
+    0000032A              L540:                             
+          Game.c   135                    }
+          Game.c   136                    else
+          Game.c   137                    {
+          Game.c   138                        uchar num = _getNaigbouringMines(field, i, j);
+    0000032A 66D3                   MOV         R13,R6
+    0000032C 65A3                   MOV         R10,R5
+    0000032E BEBC                   BSR         __getNaigbouringMines
+    00000330 64F2                   MOV.L       @R15,R4
+    00000332 6503                   MOV         R0,R5
+    00000334 645C                   EXTU.B      R5,R4
+    00000336 4415                   CMP/PL      R4
+    00000338 8B07                   BF          L539
+          Game.c   139                        if(num > 0)
+          Game.c   140                        {
+          Game.c   141                            digit = GetDigit(num);
+    0000033A D376                   MOV.L       L596+6,R3  ; _GetDigit
+    0000033C 430B                   JSR         @R3
+    0000033E 0009                   NOP
+          Game.c   142                            DrawDigit(i*TSIZE,j*TSIZE,digit);
+    00000340 D275                   MOV.L       L596+10,R2 ; _DrawDigit
+    00000342 6603                   MOV         R0,R6
+    00000344 65C3                   MOV         R12,R5
+    00000346 420B                   JSR         @R2
+    00000348 64E3                   MOV         R14,R4
+    0000034A              L539:                             
+    0000034A 7D01                   ADD         #1,R13
+    0000034C E308                   MOV         #8,R3
+    0000034E 3D33                   CMP/GE      R3,R13
+    00000350 8901                   BT          L597
+    00000352 AF6D                   BRA         L526
+    00000354 0009                   NOP
+    00000356              L597:                             
+    00000356 7A01                   ADD         #1,R10
+    00000358 E310                   MOV         #16,R3
+    0000035A 3A33                   CMP/GE      R3,R10
+    0000035C 8901                   BT          L598
+    0000035E AF5F                   BRA         L525
+    00000360 0009                   NOP
+    00000362              L598:                             
+          Game.c   143                        }
+          Game.c   144                    }
+          Game.c   145                    
+          Game.c   146                }
+          Game.c   147            }
+          Game.c   148        }
+          Game.c   149    
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 29-Dec-2020 03:00:29  PAGE   12
+
+
+SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
+
+          Game.c   150        DrawRect(selectionX * TSIZE, selectionY * TSIZE, TSIZE, TSIZE);
+    00000362 E708                   MOV         #8,R7
+    00000364 55F4                   MOV.L       @(16,R15),R5
+    00000366 6673                   MOV         R7,R6
+    00000368 54F5                   MOV.L       @(20,R15),R4
+    0000036A 4508                   SHLL2       R5
+    0000036C D36B                   MOV.L       L596+14,R3 ; _DrawRect
+    0000036E 4408                   SHLL2       R4
+    00000370 4500                   SHLL        R5
+    00000372 430B                   JSR         @R3
+    00000374 4400                   SHLL        R4
+          Game.c   151    }
+    00000376 7F28                   ADD         #40,R15
+    00000378 4F26                   LDS.L       @R15+,PR
+    0000037A 68F6                   MOV.L       @R15+,R8
+    0000037C 69F6                   MOV.L       @R15+,R9
+    0000037E 6AF6                   MOV.L       @R15+,R10
+    00000380 6BF6                   MOV.L       @R15+,R11
+    00000382 6CF6                   MOV.L       @R15+,R12
+    00000384 6DF6                   MOV.L       @R15+,R13
+    00000386 000B                   RTS
+    00000388 6EF6                   MOV.L       @R15+,R14
+          Game.c   152    
+          Game.c   153    void _prepareField(uchar* field)
+    0000038A              __prepareField:                  ; function: _prepareField
+                                                           ; frame size=0
+    0000038A 6543                   MOV         R4,R5
+    0000038C E602                   MOV         #2,R6
+    0000038E 6763                   MOV         R6,R7
+    00000390 777E                   ADD         #126,R7
+    00000392 374C                   ADD         R4,R7
+          Game.c   154    {
+          Game.c   155        int i;
+          Game.c   156        for(i = 0; i < (FWIDTH * FHEIGHT); i++)
+    00000394              L543:                             
+          Game.c   157        {
+          Game.c   158            field[i] = FIELD_COVERED;
+    00000394 2560                   MOV.B       R6,@R5
+    00000396 7501                   ADD         #1,R5
+    00000398 3572                   CMP/HS      R7,R5
+    0000039A 8BFB                   BF          L543
+          Game.c   159        }
+          Game.c   160    }
+    0000039C 000B                   RTS
+    0000039E 0009                   NOP
+          Game.c   161    
+          Game.c   162    void _placeMines(uchar* field, uchar freeX, uchar freeY, int mineCount)
+    000003A0              __placeMines:                    ; function: _placeMines
+                                                           ; frame size=48
+    000003A0 2FE6                   MOV.L       R14,@-R15
+    000003A2 6053                   MOV         R5,R0
+    000003A4 2FD6                   MOV.L       R13,@-R15
+    000003A6 6E43                   MOV         R4,R14
+    000003A8 2FC6                   MOV.L       R12,@-R15
+          Game.c   163    {
+          Game.c   164        int i, ind;
+          Game.c   165        uchar x,y;
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 29-Dec-2020 03:00:29  PAGE   13
+
+
+SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
+
+          Game.c   166    
+          Game.c   167        for(i = 0; i < mineCount;)
+    000003AA 6373                   MOV         R7,R3
+    000003AC DD5C                   MOV.L       L596+18,R13; _rand
+    000003AE 4315                   CMP/PL      R3
+    000003B0 2FB6                   MOV.L       R11,@-R15
+    000003B2 EB00                   MOV         #0,R11
+    000003B4 2FA6                   MOV.L       R10,@-R15
+    000003B6 2F96                   MOV.L       R9,@-R15
+    000003B8 2F86                   MOV.L       R8,@-R15
+    000003BA 4F22                   STS.L       PR,@-R15
+    000003BC 7FF0                   ADD         #-16,R15
+    000003BE 80F8                   MOV.B       R0,@(8,R15)
+    000003C0 6063                   MOV         R6,R0
+    000003C2 80FC                   MOV.B       R0,@(12,R15)
+    000003C4 2F72                   MOV.L       R7,@R15
+    000003C6 8F34                   BF/S        L544
+    000003C8 69B3                   MOV         R11,R9
+    000003CA              L545:                             
+          Game.c   168        {
+          Game.c   169            x = rand() % FWIDTH;
+    000003CA 4D0B                   JSR         @R13
+    000003CC 0009                   NOP
+    000003CE 4011                   CMP/PZ      R0
+    000003D0 8B01                   BF          L546
+    000003D2 A005                   BRA         L547
+    000003D4 C90F                   AND         #15,R0
+    000003D6              L546:                             
+    000003D6 6007                   NOT         R0,R0
+    000003D8 7001                   ADD         #1,R0
+    000003DA C90F                   AND         #15,R0
+    000003DC 6007                   NOT         R0,R0
+    000003DE 7001                   ADD         #1,R0
+    000003E0              L547:                             
+          Game.c   170            y = rand() % FHEIGHT;
+    000003E0 4D0B                   JSR         @R13
+    000003E2 6803                   MOV         R0,R8
+    000003E4 4011                   CMP/PZ      R0
+    000003E6 8B01                   BF          L548
+    000003E8 A005                   BRA         L549
+    000003EA C907                   AND         #7,R0
+    000003EC              L548:                             
+    000003EC 6007                   NOT         R0,R0
+    000003EE 7001                   ADD         #1,R0
+    000003F0 C907                   AND         #7,R0
+    000003F2 6007                   NOT         R0,R0
+    000003F4 7001                   ADD         #1,R0
+    000003F6              L549:                             
+          Game.c   171            ind = indexOf(x, y);
+    000003F6 6A0C                   EXTU.B      R0,R10
+    000003F8 80F4                   MOV.B       R0,@(4,R15)
+    000003FA 6C8C                   EXTU.B      R8,R12
+    000003FC 65A3                   MOV         R10,R5
+    000003FE BDFF                   BSR         _indexOf
+    00000400 64C3                   MOV         R12,R4
+    00000402 6803                   MOV         R0,R8
+          Game.c   172            if((x != freeX || y != freeY) && !_isMined(x, y, field))
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 29-Dec-2020 03:00:29  PAGE   14
+
+
+SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
+
+    00000404 84F8                   MOV.B       @(8,R15),R0
+    00000406 600C                   EXTU.B      R0,R0
+    00000408 3C00                   CMP/EQ      R0,R12
+    0000040A 8B03                   BF          L551
+    0000040C 84FC                   MOV.B       @(12,R15),R0
+    0000040E 600C                   EXTU.B      R0,R0
+    00000410 3A00                   CMP/EQ      R0,R10
+    00000412 890B                   BT          L550
+    00000414              L551:                             
+    00000414 66E3                   MOV         R14,R6
+    00000416 65A3                   MOV         R10,R5
+    00000418 BE11                   BSR         __isMined
+    0000041A 64C3                   MOV         R12,R4
+    0000041C 600C                   EXTU.B      R0,R0
+    0000041E 2008                   TST         R0,R0
+    00000420 8B04                   BF          L550
+          Game.c   173            {
+          Game.c   174                field[ind] |= FIELD_MINE;
+    00000422 38EC                   ADD         R14,R8
+    00000424 6080                   MOV.B       @R8,R0
+          Game.c   175                i++;
+    00000426 7901                   ADD         #1,R9
+    00000428 CB01                   OR          #1,R0
+    0000042A 2800                   MOV.B       R0,@R8
+    0000042C              L550:                             
+    0000042C 62F2                   MOV.L       @R15,R2
+    0000042E 3923                   CMP/GE      R2,R9
+    00000430 8BCB                   BF          L545
+    00000432              L544:                             
+          Game.c   176            }
+          Game.c   177        }
+          Game.c   178    
+          Game.c   179        for(x = 0; x < FWIDTH; x++)
+    00000432 60B3                   MOV         R11,R0
+    00000434 80F4                   MOV.B       R0,@(4,R15)
+    00000436              L552:                             
+          Game.c   180        {
+          Game.c   181            for(y = 0; y < FHEIGHT; y++)
+    00000436 68B3                   MOV         R11,R8
+    00000438 84F4                   MOV.B       @(4,R15),R0
+    0000043A 600C                   EXTU.B      R0,R0
+    0000043C 2F02                   MOV.L       R0,@R15
+    0000043E 6903                   MOV         R0,R9
+    00000440 79FF                   ADD         #-1,R9
+    00000442 6A03                   MOV         R0,R10
+    00000444 7A01                   ADD         #1,R10
+    00000446              L553:                             
+          Game.c   182            {
+          Game.c   183                uchar val = 0;
+    00000446 6DB3                   MOV         R11,R13
+    00000448 6C8C                   EXTU.B      R8,R12
+    0000044A 66E3                   MOV         R14,R6
+    0000044C 65C3                   MOV         R12,R5
+    0000044E 75FF                   ADD         #-1,R5
+    00000450 BDF5                   BSR         __isMined
+    00000452 6493                   MOV         R9,R4
+    00000454 600C                   EXTU.B      R0,R0
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 29-Dec-2020 03:00:29  PAGE   15
+
+
+SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
+
+    00000456 2008                   TST         R0,R0
+    00000458 8D01                   BT/S        L554
+          Game.c   184                if(_isMined(x-1,y-1,field)) val++;
+          Game.c   185                if(_isMined(x+1,y-1,field)) val++;
+    0000045A 66E3                   MOV         R14,R6
+    0000045C 7D01                   ADD         #1,R13
+    0000045E              L554:                             
+    0000045E 65C3                   MOV         R12,R5
+    00000460 75FF                   ADD         #-1,R5
+    00000462 BDEC                   BSR         __isMined
+    00000464 64A3                   MOV         R10,R4
+    00000466 600C                   EXTU.B      R0,R0
+    00000468 2008                   TST         R0,R0
+    0000046A 8D01                   BT/S        L555
+          Game.c   186                if(_isMined(x-1,y+1,field)) val++;
+    0000046C 66E3                   MOV         R14,R6
+    0000046E 7D01                   ADD         #1,R13
+    00000470              L555:                             
+    00000470 65C3                   MOV         R12,R5
+    00000472 7501                   ADD         #1,R5
+    00000474 BDE3                   BSR         __isMined
+    00000476 6493                   MOV         R9,R4
+    00000478 600C                   EXTU.B      R0,R0
+    0000047A 2008                   TST         R0,R0
+    0000047C 8D01                   BT/S        L556
+          Game.c   187                if(_isMined(x+1,y+1,field)) val++;
+    0000047E 66E3                   MOV         R14,R6
+    00000480 7D01                   ADD         #1,R13
+    00000482              L556:                             
+    00000482 65C3                   MOV         R12,R5
+    00000484 7501                   ADD         #1,R5
+    00000486 BDDA                   BSR         __isMined
+    00000488 64A3                   MOV         R10,R4
+    0000048A 600C                   EXTU.B      R0,R0
+    0000048C 2008                   TST         R0,R0
+    0000048E 8D01                   BT/S        L557
+          Game.c   188                if(_isMined(x-1,y,field)) val++;
+    00000490 66E3                   MOV         R14,R6
+    00000492 7D01                   ADD         #1,R13
+    00000494              L557:                             
+    00000494 65C3                   MOV         R12,R5
+    00000496 BDD2                   BSR         __isMined
+    00000498 6493                   MOV         R9,R4
+    0000049A 600C                   EXTU.B      R0,R0
+    0000049C 2008                   TST         R0,R0
+    0000049E 8D01                   BT/S        L558
+          Game.c   189                if(_isMined(x+1,y,field)) val++;
+    000004A0 66E3                   MOV         R14,R6
+    000004A2 7D01                   ADD         #1,R13
+    000004A4              L558:                             
+    000004A4 65C3                   MOV         R12,R5
+    000004A6 BDCA                   BSR         __isMined
+    000004A8 64A3                   MOV         R10,R4
+    000004AA 600C                   EXTU.B      R0,R0
+    000004AC 2008                   TST         R0,R0
+    000004AE 8D01                   BT/S        L559
+          Game.c   190                if(_isMined(x,y-1,field)) val++;
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 29-Dec-2020 03:00:29  PAGE   16
+
+
+SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
+
+    000004B0 66E3                   MOV         R14,R6
+    000004B2 7D01                   ADD         #1,R13
+    000004B4              L559:                             
+    000004B4 65C3                   MOV         R12,R5
+    000004B6 75FF                   ADD         #-1,R5
+    000004B8 BDC1                   BSR         __isMined
+    000004BA 64F2                   MOV.L       @R15,R4
+    000004BC 600C                   EXTU.B      R0,R0
+    000004BE 2008                   TST         R0,R0
+    000004C0 8D01                   BT/S        L560
+          Game.c   191                if(_isMined(x,y+1,field)) val++;
+    000004C2 66E3                   MOV         R14,R6
+    000004C4 7D01                   ADD         #1,R13
+    000004C6              L560:                             
+    000004C6 65C3                   MOV         R12,R5
+    000004C8 7501                   ADD         #1,R5
+    000004CA BDB8                   BSR         __isMined
+    000004CC 64F2                   MOV.L       @R15,R4
+    000004CE 600C                   EXTU.B      R0,R0
+    000004D0 2008                   TST         R0,R0
+    000004D2 8900                   BT          L561
+    000004D4 7D01                   ADD         #1,R13
+    000004D6              L561:                             
+          Game.c   192                _setNaigbouringMines(field, x, y, val);
+    000004D6 67D3                   MOV         R13,R7
+    000004D8 84F4                   MOV.B       @(4,R15),R0
+    000004DA 6683                   MOV         R8,R6
+    000004DC 6503                   MOV         R0,R5
+    000004DE BDFE                   BSR         __setNaigbouringMines
+    000004E0 64E3                   MOV         R14,R4
+    000004E2 7801                   ADD         #1,R8
+    000004E4 628C                   EXTU.B      R8,R2
+    000004E6 E308                   MOV         #8,R3
+    000004E8 3233                   CMP/GE      R3,R2
+    000004EA 8BAC                   BF          L553
+    000004EC 84F4                   MOV.B       @(4,R15),R0
+    000004EE E310                   MOV         #16,R3
+    000004F0 7001                   ADD         #1,R0
+    000004F2 80F4                   MOV.B       R0,@(4,R15)
+    000004F4 600C                   EXTU.B      R0,R0
+    000004F6 3033                   CMP/GE      R3,R0
+    000004F8 8B9D                   BF          L552
+          Game.c   193            }
+          Game.c   194        }
+          Game.c   195    }
+    000004FA 7F10                   ADD         #16,R15
+    000004FC 4F26                   LDS.L       @R15+,PR
+    000004FE 68F6                   MOV.L       @R15+,R8
+    00000500 69F6                   MOV.L       @R15+,R9
+    00000502 6AF6                   MOV.L       @R15+,R10
+    00000504 6BF6                   MOV.L       @R15+,R11
+    00000506 6CF6                   MOV.L       @R15+,R12
+    00000508 6DF6                   MOV.L       @R15+,R13
+    0000050A 000B                   RTS
+    0000050C 6EF6                   MOV.L       @R15+,R14
+    0000050E              L596:                             
+    0000050E 0000                   .DATA.W     0
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 29-Dec-2020 03:00:29  PAGE   17
+
+
+SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
+
+    00000510 <00000000>             .DATA.L     _SetPoint
+    00000514 <00000000>             .DATA.L     _GetDigit
+    00000518 <00000000>             .DATA.L     _DrawDigit
+    0000051C <00000000>             .DATA.L     _DrawRect
+    00000520 <00000000>             .DATA.L     _rand
+          Game.c   196    
+          Game.c   197    void _toggleFlag(uchar *field, uchar x, uchar y)
+    00000524              __toggleFlag:                    ; function: _toggleFlag
+                                                           ; frame size=24
+    00000524 2FE6                   MOV.L       R14,@-R15
+    00000526 6063                   MOV         R6,R0
+    00000528 2FD6                   MOV.L       R13,@-R15
+    0000052A 2FC6                   MOV.L       R12,@-R15
+    0000052C 4F22                   STS.L       PR,@-R15
+    0000052E 6C43                   MOV         R4,R12
+    00000530 7FF8                   ADD         #-8,R15
+    00000532 66C3                   MOV         R12,R6
+    00000534 2F50                   MOV.B       R5,@R15
+    00000536 80F4                   MOV.B       R0,@(4,R15)
+    00000538 84F4                   MOV.B       @(4,R15),R0
+    0000053A 6E03                   MOV         R0,R14
+    0000053C 6DF0                   MOV.B       @R15,R13
+    0000053E 6EEC                   EXTU.B      R14,R14
+    00000540 6DDC                   EXTU.B      R13,R13
+    00000542 65E3                   MOV         R14,R5
+    00000544 BD6E                   BSR         __isCovered
+    00000546 64D3                   MOV         R13,R4
+    00000548 600C                   EXTU.B      R0,R0
+    0000054A 2008                   TST         R0,R0
+    0000054C 890F                   BT          L563
+          Game.c   198    {
+          Game.c   199        if(!_isCovered(x, y, field)) return;
+          Game.c   200        if(_isFlagged(x, y, field))
+    0000054E 66C3                   MOV         R12,R6
+    00000550 65E3                   MOV         R14,R5
+    00000552 BD5A                   BSR         __isFlagged
+    00000554 64D3                   MOV         R13,R4
+    00000556 600C                   EXTU.B      R0,R0
+    00000558 2008                   TST         R0,R0
+    0000055A 0729                   MOVT        R7
+          Game.c   201            _setFlagged(x, y, field, 0);
+    0000055C 66C3                   MOV         R12,R6
+    0000055E 65E3                   MOV         R14,R5
+    00000560 64D3                   MOV         R13,R4
+    00000562 7F08                   ADD         #8,R15
+    00000564 4F26                   LDS.L       @R15+,PR
+    00000566 6CF6                   MOV.L       @R15+,R12
+    00000568 6DF6                   MOV.L       @R15+,R13
+    0000056A AD89                   BRA         __setFlagged
+    0000056C 6EF6                   MOV.L       @R15+,R14
+    0000056E              L563:                             
+          Game.c   202        else
+          Game.c   203            _setFlagged(x, y, field, 1);
+          Game.c   204        
+          Game.c   205    }
+    0000056E 7F08                   ADD         #8,R15
+    00000570 4F26                   LDS.L       @R15+,PR
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 29-Dec-2020 03:00:29  PAGE   18
+
+
+SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
+
+    00000572 6CF6                   MOV.L       @R15+,R12
+    00000574 6DF6                   MOV.L       @R15+,R13
+    00000576 000B                   RTS
+    00000578 6EF6                   MOV.L       @R15+,R14
+          Game.c   206    
+          Game.c   207    void _uncoverAll(uchar* field)
+    0000057A              __uncoverAll:                    ; function: _uncoverAll
+                                                           ; frame size=0
+    0000057A 6543                   MOV         R4,R5
+    0000057C 965B                   MOV.W       L599,R6    ; H'0080
+    0000057E 364C                   ADD         R4,R6
+          Game.c   208    {
+          Game.c   209        int i;
+          Game.c   210        for(i = 0; i < FWIDTH * FHEIGHT; i++)
+    00000580              L566:                             
+          Game.c   211        {
+          Game.c   212            field[i] &= ~ FIELD_COVERED;
+    00000580 6050                   MOV.B       @R5,R0
+    00000582 C9FD                   AND         #253,R0
+    00000584 2500                   MOV.B       R0,@R5
+    00000586 7501                   ADD         #1,R5
+    00000588 3562                   CMP/HS      R6,R5
+    0000058A 8BF9                   BF          L566
+          Game.c   213        }
+          Game.c   214    }
+    0000058C 000B                   RTS
+    0000058E 0009                   NOP
+          Game.c   215    
+          Game.c   216    uchar _isCleared(uchar *field)
+    00000590              __isCleared:                     ; function: _isCleared
+                                                           ; frame size=20
+    00000590 2FE6                   MOV.L       R14,@-R15
+          Game.c   217    {
+          Game.c   218        int i;
+          Game.c   219    
+          Game.c   220        uchar allFlagged = TRUE;
+    00000592 E601                   MOV         #1,R6
+    00000594 2FD6                   MOV.L       R13,@-R15
+    00000596 6743                   MOV         R4,R7
+    00000598 2FB6                   MOV.L       R11,@-R15
+          Game.c   221        uchar allUncovered = TRUE;
+    0000059A 6D63                   MOV         R6,R13
+    0000059C 2FA6                   MOV.L       R10,@-R15
+    0000059E 6B63                   MOV         R6,R11
+    000005A0 2F96                   MOV.L       R9,@-R15
+    000005A2 6A43                   MOV         R4,R10
+    000005A4 EE02                   MOV         #2,R14
+    000005A6 E500                   MOV         #0,R5
+    000005A8 69E3                   MOV         R14,R9
+    000005AA 797E                   ADD         #126,R9
+    000005AC 394C                   ADD         R4,R9
+          Game.c   222    
+          Game.c   223        for(i = 0; i < (FWIDTH*FHEIGHT); i++)
+    000005AE              L567:                             
+          Game.c   224        {
+          Game.c   225            if((field[i] & FIELD_COVERED) && !(field[i] & FIELD_MINE))
+    000005AE 6474                   MOV.B       @R7+,R4
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 29-Dec-2020 03:00:29  PAGE   19
+
+
+SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
+
+    000005B0 644C                   EXTU.B      R4,R4
+    000005B2 6343                   MOV         R4,R3
+    000005B4 23E8                   TST         R14,R3
+    000005B6 8903                   BT          L568
+    000005B8 E101                   MOV         #1,R1
+    000005BA 2148                   TST         R4,R1
+    000005BC 8B00                   BF          L568
+          Game.c   226            {
+          Game.c   227                allUncovered = FALSE;
+    000005BE 6D53                   MOV         R5,R13
+    000005C0              L568:                             
+          Game.c   228            }
+          Game.c   229            if((field[i] & FIELD_MINE) && !(field[i] & FIELD_FLAGGED)
+          Game.c   230                || !(field[i] & FIELD_MINE) && (field[i] & FIELD_FLAGGED))
+    000005C0 64A4                   MOV.B       @R10+,R4
+    000005C2 644C                   EXTU.B      R4,R4
+    000005C4 6043                   MOV         R4,R0
+    000005C6 2069                   AND         R6,R0
+    000005C8 2008                   TST         R0,R0
+    000005CA 8902                   BT          L571
+    000005CC E204                   MOV         #4,R2
+    000005CE 2248                   TST         R4,R2
+    000005D0 8904                   BT          L570
+    000005D2              L571:                             
+    000005D2 2008                   TST         R0,R0
+    000005D4 8B03                   BF          L569
+    000005D6 E304                   MOV         #4,R3
+    000005D8 2348                   TST         R4,R3
+    000005DA 8900                   BT          L569
+    000005DC              L570:                             
+          Game.c   231            {
+          Game.c   232                allFlagged = FALSE;
+    000005DC 6B53                   MOV         R5,R11
+    000005DE              L569:                             
+    000005DE 3792                   CMP/HS      R9,R7
+    000005E0 8BE5                   BF          L567
+          Game.c   233            }
+          Game.c   234        }
+          Game.c   235    
+          Game.c   236        return allFlagged || allUncovered;
+    000005E2 6BBC                   EXTU.B      R11,R11
+    000005E4 2BB8                   TST         R11,R11
+    000005E6 8B04                   BF          L572
+    000005E8 6DDC                   EXTU.B      R13,R13
+    000005EA 2DD8                   TST         R13,R13
+    000005EC 8B01                   BF          L572
+    000005EE A001                   BRA         L574
+    000005F0 E000                   MOV         #0,R0
+    000005F2              L572:                             
+    000005F2 E001                   MOV         #1,R0
+          Game.c   237    }
+    000005F4              L574:                             
+    000005F4 69F6                   MOV.L       @R15+,R9
+    000005F6 6AF6                   MOV.L       @R15+,R10
+    000005F8 6BF6                   MOV.L       @R15+,R11
+    000005FA 6DF6                   MOV.L       @R15+,R13
+    000005FC 000B                   RTS
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 29-Dec-2020 03:00:29  PAGE   20
+
+
+SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
+
+    000005FE 6EF6                   MOV.L       @R15+,R14
+          Game.c   238    
+          Game.c   239    void _flagAll(uchar *field)
+    00000600              __flagAll:                       ; function: _flagAll
+                                                           ; frame size=8
+    00000600 2FD6                   MOV.L       R13,@-R15
+    00000602 6543                   MOV         R4,R5
+    00000604 2FC6                   MOV.L       R12,@-R15
+    00000606 6743                   MOV         R4,R7
+    00000608 6643                   MOV         R4,R6
+    0000060A ED01                   MOV         #1,R13
+    0000060C E107                   MOV         #7,R1
+    0000060E 6CD3                   MOV         R13,R12
+    00000610 7C7F                   ADD         #127,R12
+    00000612 3C4C                   ADD         R4,R12
+          Game.c   240    {
+          Game.c   241        int i;
+          Game.c   242        for(i = 0; i < FWIDTH * FHEIGHT; i++)
+    00000614              L575:                             
+          Game.c   243        {
+          Game.c   244            if(field[i] & FIELD_MINE)
+    00000614 6350                   MOV.B       @R5,R3
+    00000616 633C                   EXTU.B      R3,R3
+    00000618 23D8                   TST         R13,R3
+    0000061A 8901                   BT          L576
+          Game.c   245                field[i] = FIELD_MINE | FIELD_FLAGGED | FIELD_COVERED;
+    0000061C A003                   BRA         L577
+    0000061E 2610                   MOV.B       R1,@R6
+    00000620              L576:                             
+          Game.c   246            else
+          Game.c   247                field[i] &= ~(FIELD_COVERED | FIELD_FLAGGED);
+    00000620 6070                   MOV.B       @R7,R0
+    00000622 C9F9                   AND         #249,R0
+    00000624 2700                   MOV.B       R0,@R7
+    00000626              L577:                             
+    00000626 7701                   ADD         #1,R7
+    00000628 7501                   ADD         #1,R5
+    0000062A 35C2                   CMP/HS      R12,R5
+    0000062C 8FF2                   BF/S        L575
+    0000062E 7601                   ADD         #1,R6
+          Game.c   248        }
+          Game.c   249    }
+    00000630 6CF6                   MOV.L       @R15+,R12
+    00000632 000B                   RTS
+    00000634 6DF6                   MOV.L       @R15+,R13
+    00000636              L599:                             
+    00000636 0080                   .DATA.W     H'0080
+          Game.c   250    
+          Game.c   251    uchar RunGame(uchar numMines)
+    00000638              _RunGame:                        ; function: RunGame
+                                                           ; frame size=228
+    00000638 2FE6                   MOV.L       R14,@-R15
+    0000063A 2FD6                   MOV.L       R13,@-R15
+    0000063C 2FC6                   MOV.L       R12,@-R15
+    0000063E 2FB6                   MOV.L       R11,@-R15
+    00000640 2FA6                   MOV.L       R10,@-R15
+          Game.c   252    {
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 29-Dec-2020 03:00:29  PAGE   21
+
+
+SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
+
+          Game.c   253        unsigned int key;
+          Game.c   254        uchar field[FWIDTH * FHEIGHT];
+          Game.c   255        int selX = 0, selY = 0;
+    00000642 EB00                   MOV         #0,R11
+          Game.c   256        int i, j;
+          Game.c   257        uchar prepared = FALSE;
+          Game.c   258        char custText[20];
+          Game.c   259        uchar* digit;
+          Game.c   260    
+          Game.c   261        Clear();
+    00000644 D336                   MOV.L       L600+22,R3 ; _Clear
+    00000646 6CB3                   MOV         R11,R12
+    00000648 2F96                   MOV.L       R9,@-R15
+    0000064A 6DB3                   MOV         R11,R13
+    0000064C 905D                   MOV.W       L600,R0    ; H'FF4C
+    0000064E 2F86                   MOV.L       R8,@-R15
+    00000650 4F22                   STS.L       PR,@-R15
+    00000652 3F0C                   ADD         R0,R15
+    00000654 E014                   MOV         #20,R0
+    00000656 0F44                   MOV.B       R4,@(R0,R15)
+    00000658 60B3                   MOV         R11,R0
+    0000065A 430B                   JSR         @R3
+    0000065C 80FC                   MOV.B       R0,@(12,R15)
+          Game.c   262        _prepareField(field);
+    0000065E 6EF3                   MOV         R15,R14
+    00000660 7E34                   ADD         #52,R14
+    00000662 BE92                   BSR         __prepareField
+    00000664 64E3                   MOV         R14,R4
+    00000666 69F3                   MOV         R15,R9
+    00000668 DA2E                   MOV.L       L600+26,R10; _locate
+    0000066A 62E3                   MOV         R14,R2
+    0000066C 934E                   MOV.W       L600+2,R3  ; H'0080
+    0000066E 7920                   ADD         #32,R9
+    00000670 984D                   MOV.W       L600+4,R8  ; H'07D0
+    00000672 33EC                   ADD         R14,R3
+    00000674 1F34                   MOV.L       R3,@(16,R15)
+    00000676 1F26                   MOV.L       R2,@(24,R15)
+          Game.c   263    
+          Game.c   264        while(1)
+    00000678              L579:                             
+          Game.c   265        {
+          Game.c   266            uchar gameover = FALSE;
+    00000678 E01C                   MOV         #28,R0
+          Game.c   267    
+          Game.c   268            _drawField(field, selX, selY);
+    0000067A 66D3                   MOV         R13,R6
+    0000067C 0FB4                   MOV.B       R11,@(R0,R15)
+    0000067E 65C3                   MOV         R12,R5
+    00000680 BDBE                   BSR         __drawField
+    00000682 64E3                   MOV         R14,R4
+          Game.c   269            Bdisp_PutDisp_DD();
+    00000684 D228                   MOV.L       L600+30,R2 ; _Bdisp_PutDisp_DD
+    00000686 420B                   JSR         @R2
+    00000688 0009                   NOP
+          Game.c   270            GetKey(&key);
+    0000068A 64F3                   MOV         R15,R4
+    0000068C D327                   MOV.L       L600+34,R3 ; _GetKey
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 29-Dec-2020 03:00:29  PAGE   22
+
+
+SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
+
+    0000068E 430B                   JSR         @R3
+    00000690 7404                   ADD         #4,R4
+    00000692 E014                   MOV         #20,R0
+    00000694 913C                   MOV.W       L600+6,R1  ; H'7542
+    00000696 00FC                   MOV.B       @(R0,R15),R0
+    00000698 600C                   EXTU.B      R0,R0
+    0000069A 1F02                   MOV.L       R0,@(8,R15)
+    0000069C 50F1                   MOV.L       @(4,R15),R0
+    0000069E 3010                   CMP/EQ      R1,R0
+    000006A0 8913                   BT          L494
+    000006A2 9136                   MOV.W       L600+8,R1  ; H'7547
+    000006A4 3010                   CMP/EQ      R1,R0
+    000006A6 8912                   BT          L495
+    000006A8 9134                   MOV.W       L600+10,R1 ; H'7544
+    000006AA 3010                   CMP/EQ      R1,R0
+    000006AC 8911                   BT          L496
+    000006AE 9132                   MOV.W       L600+12,R1 ; H'7545
+    000006B0 3010                   CMP/EQ      R1,R0
+    000006B2 8910                   BT          L497
+    000006B4 9130                   MOV.W       L600+14,R1 ; H'7537
+    000006B6 3010                   CMP/EQ      R1,R0
+    000006B8 890F                   BT          L498
+    000006BA 912E                   MOV.W       L600+16,R1 ; H'7539
+    000006BC 3010                   CMP/EQ      R1,R0
+    000006BE 891E                   BT          L499
+    000006C0 912C                   MOV.W       L600+18,R1 ; H'7532
+    000006C2 3010                   CMP/EQ      R1,R0
+    000006C4 8934                   BT          L500
+    000006C6 A07A                   BRA         L580
+    000006C8 0009                   NOP
+    000006CA              L494:                            ; case label 
+          Game.c   271    
+          Game.c   272            switch(key)
+          Game.c   273            {
+          Game.c   274                case INP_UP:
+          Game.c   275                    selY--;
+          Game.c   276                    break;
+    000006CA A078                   BRA         L580
+    000006CC 7DFF                   ADD         #-1,R13
+    000006CE              L495:                            ; case label 
+          Game.c   277                case INP_DOWN:
+          Game.c   278                    selY++;
+          Game.c   279                    break;
+    000006CE A076                   BRA         L580
+    000006D0 7D01                   ADD         #1,R13
+    000006D2              L496:                            ; case label 
+          Game.c   280                case INP_LEFT:
+          Game.c   281                    selX--;
+          Game.c   282                    break;
+    000006D2 A074                   BRA         L580
+    000006D4 7CFF                   ADD         #-1,R12
+    000006D6              L497:                            ; case label 
+          Game.c   283                case INP_RIGHT:
+          Game.c   284                    selX++;
+          Game.c   285                    break;
+    000006D6 A072                   BRA         L580
+    000006D8 7C01                   ADD         #1,R12
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 29-Dec-2020 03:00:29  PAGE   23
+
+
+SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
+
+    000006DA              L498:                            ; case label 
+          Game.c   286                case INP_UNCOVER:
+          Game.c   287                    if(!prepared)
+    000006DA 84FC                   MOV.B       @(12,R15),R0
+    000006DC 2008                   TST         R0,R0
+    000006DE 8B06                   BF          L581
+          Game.c   288                    {
+          Game.c   289                        prepared = TRUE;
+    000006E0 E001                   MOV         #1,R0
+          Game.c   290                        _placeMines(field, selX, selY, numMines);
+    000006E2 66D3                   MOV         R13,R6
+    000006E4 80FC                   MOV.B       R0,@(12,R15)
+    000006E6 65C3                   MOV         R12,R5
+    000006E8 57F2                   MOV.L       @(8,R15),R7
+    000006EA BE59                   BSR         __placeMines
+    000006EC 64E3                   MOV         R14,R4
+    000006EE              L581:                             
+          Game.c   291                    }
+          Game.c   292                    gameover = _uncover(field, selX, selY);
+    000006EE 66D3                   MOV         R13,R6
+    000006F0 65C3                   MOV         R12,R5
+    000006F2 BD16                   BSR         __uncover
+    000006F4 64E3                   MOV         R14,R4
+    000006F6 61F3                   MOV         R15,R1
+    000006F8 711C                   ADD         #28,R1
+          Game.c   293                    break;
+    000006FA A060                   BRA         L580
+    000006FC 2100                   MOV.B       R0,@R1
+    000006FE              L499:                            ; case label 
+          Game.c   294                case INP_FLAG:
+          Game.c   295                    _toggleFlag(field, selX, selY);
+    000006FE 66D3                   MOV         R13,R6
+    00000700 65C3                   MOV         R12,R5
+    00000702 BF0F                   BSR         __toggleFlag
+    00000704 64E3                   MOV         R14,R4
+          Game.c   296                    break;
+    00000706 A05A                   BRA         L580
+    00000708 0009                   NOP
+    0000070A              L600:                             
+    0000070A FF4C                   .DATA.W     H'FF4C
+    0000070C 0080                   .DATA.W     H'0080
+    0000070E 07D0                   .DATA.W     H'07D0
+    00000710 7542                   .DATA.W     H'7542
+    00000712 7547                   .DATA.W     H'7547
+    00000714 7544                   .DATA.W     H'7544
+    00000716 7545                   .DATA.W     H'7545
+    00000718 7537                   .DATA.W     H'7537
+    0000071A 7539                   .DATA.W     H'7539
+    0000071C 7532                   .DATA.W     H'7532
+    0000071E 0000                   .DATA.W     0
+    00000720 <00000000>             .DATA.L     _Clear
+    00000724 <00000000>             .DATA.L     _locate
+    00000728 <00000000>             .DATA.L     _Bdisp_PutDisp_DD
+    0000072C <00000000>             .DATA.L     _GetKey
+    00000730              L500:                            ; case label 
+          Game.c   297                case INP_MENU:
+          Game.c   298                    PopUpWin(5);
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 29-Dec-2020 03:00:29  PAGE   24
+
+
+SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
+
+    00000730 D233                   MOV.L       L601+2,R2  ; _PopUpWin
+    00000732 420B                   JSR         @R2
+    00000734 E405                   MOV         #5,R4
+          Game.c   299                    locate(0,5);
+    00000736 E505                   MOV         #5,R5
+    00000738 4A0B                   JSR         @R10
+    0000073A E400                   MOV         #0,R4
+          Game.c   300                    for(i = 0, j = 0; i < (FWIDTH*FHEIGHT); i++)
+    0000073C 2FB2                   MOV.L       R11,@R15
+    0000073E 54F6                   MOV.L       @(24,R15),R4
+    00000740              L582:                             
+          Game.c   301                        if(field[i] & FIELD_FLAGGED)
+    00000740 6040                   MOV.B       @R4,R0
+    00000742 600C                   EXTU.B      R0,R0
+    00000744 C804                   TST         #4,R0
+    00000746 8D03                   BT/S        L583
+    00000748 7401                   ADD         #1,R4
+          Game.c   302                            j++;
+    0000074A 62F2                   MOV.L       @R15,R2
+    0000074C 7201                   ADD         #1,R2
+    0000074E 2F22                   MOV.L       R2,@R15
+    00000750              L583:                             
+    00000750 53F4                   MOV.L       @(16,R15),R3
+    00000752 3432                   CMP/HS      R3,R4
+    00000754 8BF4                   BF          L582
+          Game.c   303                    locate(5,5);
+    00000756 E505                   MOV         #5,R5
+    00000758 4A0B                   JSR         @R10
+    0000075A 6453                   MOV         R5,R4
+          Game.c   304                    sprintf(custText, ": %i", j);
+    0000075C 63F2                   MOV.L       @R15,R3
+    0000075E 2F36                   MOV.L       R3,@-R15
+    00000760 D228                   MOV.L       L601+6,R2  ; L484
+    00000762 2F26                   MOV.L       R2,@-R15
+    00000764 D328                   MOV.L       L601+10,R3 ; _sprintf
+    00000766 430B                   JSR         @R3
+    00000768 6493                   MOV         R9,R4
+          Game.c   305                    Print((uchar*)custText);
+    0000076A 1F92                   MOV.L       R9,@(8,R15)
+    0000076C D327                   MOV.L       L601+14,R3 ; _Print
+    0000076E 430B                   JSR         @R3
+    00000770 6493                   MOV         R9,R4
+          Game.c   306                    digit = GetDigit(ICON_FLAG2);
+    00000772 D227                   MOV.L       L601+18,R2 ; _GetDigit
+    00000774 420B                   JSR         @R2
+    00000776 E40C                   MOV         #12,R4
+          Game.c   307                    DrawDigit(6*3, 8*4, digit);
+    00000778 D326                   MOV.L       L601+22,R3 ; _DrawDigit
+    0000077A 6603                   MOV         R0,R6
+    0000077C E520                   MOV         #32,R5
+    0000077E 430B                   JSR         @R3
+    00000780 E412                   MOV         #18,R4
+          Game.c   308                    locate(5,6);
+    00000782 E506                   MOV         #6,R5
+    00000784 4A0B                   JSR         @R10
+    00000786 E405                   MOV         #5,R4
+          Game.c   309                    sprintf(custText, ": %i",(int)numMines);
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 29-Dec-2020 03:00:29  PAGE   25
+
+
+SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
+
+    00000788 52F4                   MOV.L       @(16,R15),R2
+    0000078A 2F26                   MOV.L       R2,@-R15
+    0000078C D31D                   MOV.L       L601+6,R3  ; L484
+    0000078E 2F36                   MOV.L       R3,@-R15
+    00000790 D21D                   MOV.L       L601+10,R2 ; _sprintf
+    00000792 420B                   JSR         @R2
+    00000794 6493                   MOV         R9,R4
+    00000796 7F10                   ADD         #16,R15
+          Game.c   310                    Print((uchar*)custText);
+    00000798 D31C                   MOV.L       L601+14,R3 ; _Print
+    0000079A 430B                   JSR         @R3
+    0000079C 64F2                   MOV.L       @R15,R4
+          Game.c   311                    digit = GetDigit(ICON_MINE);
+    0000079E D21C                   MOV.L       L601+18,R2 ; _GetDigit
+    000007A0 420B                   JSR         @R2
+    000007A2 E40B                   MOV         #11,R4
+          Game.c   312                    DrawDigit(6*3, 8*5, digit);
+    000007A4 D31B                   MOV.L       L601+22,R3 ; _DrawDigit
+    000007A6 6603                   MOV         R0,R6
+    000007A8 E528                   MOV         #40,R5
+    000007AA 430B                   JSR         @R3
+    000007AC E412                   MOV         #18,R4
+          Game.c   313                    if(ShowMenuNoBorder(1, "Continue\nExit Game") == 1) return GAMEND_USEREXIT;
+    000007AE D51A                   MOV.L       L601+26,R5 ; L485
+    000007B0 D21A                   MOV.L       L601+30,R2 ; _ShowMenuNoBorder
+    000007B2 420B                   JSR         @R2
+    000007B4 E401                   MOV         #1,R4
+    000007B6 8801                   CMP/EQ      #1,R0
+    000007B8 8B01                   BF          L580
+    000007BA A04F                   BRA         L585
+    000007BC E001                   MOV         #1,R0
+    000007BE              L580:                             
+          Game.c   314                    break;
+          Game.c   315            }
+          Game.c   316            if(selX < 0) selX = FWIDTH - 1;
+    000007BE 4C11                   CMP/PZ      R12
+    000007C0 8900                   BT          L586
+    000007C2 EC0F                   MOV         #15,R12
+    000007C4              L586:                             
+          Game.c   317            if(selY < 0) selY = FHEIGHT - 1;
+    000007C4 4D11                   CMP/PZ      R13
+    000007C6 8D01                   BT/S        L587
+          Game.c   318            if(selX >= FWIDTH) selX = 0;
+    000007C8 E310                   MOV         #16,R3
+    000007CA ED07                   MOV         #7,R13
+    000007CC              L587:                             
+    000007CC 3C33                   CMP/GE      R3,R12
+    000007CE 8F01                   BF/S        L588
+          Game.c   319            if(selY >= FHEIGHT) selY = 0;
+    000007D0 E308                   MOV         #8,R3
+    000007D2 6CB3                   MOV         R11,R12
+    000007D4              L588:                             
+    000007D4 3D33                   CMP/GE      R3,R13
+    000007D6 8B00                   BF          L589
+    000007D8 6DB3                   MOV         R11,R13
+    000007DA              L589:                             
+          Game.c   320    
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 29-Dec-2020 03:00:29  PAGE   26
+
+
+SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
+
+          Game.c   321            if(gameover)
+    000007DA E01C                   MOV         #28,R0
+    000007DC 03FC                   MOV.B       @(R0,R15),R3
+    000007DE 2338                   TST         R3,R3
+    000007E0 8922                   BT          L590
+          Game.c   322            {
+          Game.c   323                Clear();
+    000007E2 D30F                   MOV.L       L601+34,R3 ; _Clear
+    000007E4 430B                   JSR         @R3
+    000007E6 0009                   NOP
+          Game.c   324                _uncoverAll(field);
+    000007E8 BEC7                   BSR         __uncoverAll
+    000007EA 64E3                   MOV         R14,R4
+          Game.c   325                _drawField(field, -1, -1);
+    000007EC E6FF                   MOV         #-1,R6
+    000007EE 6563                   MOV         R6,R5
+    000007F0 BD06                   BSR         __drawField
+    000007F2 64E3                   MOV         R14,R4
+          Game.c   326                Sleep(2000);
+    000007F4 D20B                   MOV.L       L601+38,R2 ; _Sleep
+    000007F6 420B                   JSR         @R2
+    000007F8 6483                   MOV         R8,R4
+          Game.c   327                return GAMEND_LOOSE;
+    000007FA A02F                   BRA         L585
+    000007FC E002                   MOV         #2,R0
+    000007FE              L601:                             
+    000007FE 0000                   .DATA.W     0
+    00000800 <00000000>             .DATA.L     _PopUpWin
+    00000804 <00000000>             .DATA.L     L484
+    00000808 <00000000>             .DATA.L     _sprintf
+    0000080C <00000000>             .DATA.L     _Print
+    00000810 <00000000>             .DATA.L     _GetDigit
+    00000814 <00000000>             .DATA.L     _DrawDigit
+    00000818 <00000000>             .DATA.L     L485
+    0000081C <00000000>             .DATA.L     _ShowMenuNoBorder
+    00000820 <00000000>             .DATA.L     _Clear
+    00000824 <00000000>             .DATA.L     _Sleep
+    00000828              L590:                             
+          Game.c   328            }
+          Game.c   329    
+          Game.c   330            if(prepared && _isCleared(field))
+    00000828 84FC                   MOV.B       @(12,R15),R0
+    0000082A 2008                   TST         R0,R0
+    0000082C 8B01                   BF          L602
+    0000082E AF23                   BRA         L579
+    00000830 0009                   NOP
+    00000832              L602:                             
+    00000832 64F3                   MOV         R15,R4
+    00000834 BEAC                   BSR         __isCleared
+    00000836 7434                   ADD         #52,R4
+    00000838 600C                   EXTU.B      R0,R0
+    0000083A 2008                   TST         R0,R0
+    0000083C 8B01                   BF          L603
+    0000083E AF1B                   BRA         L579
+    00000840 0009                   NOP
+    00000842              L603:                             
+          Game.c   331            {
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 29-Dec-2020 03:00:29  PAGE   27
+
+
+SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
+
+          Game.c   332                Clear();
+    00000842 D30C                   MOV.L       L604+2,R3  ; _Clear
+    00000844 430B                   JSR         @R3
+    00000846 0009                   NOP
+          Game.c   333                _flagAll(field);
+    00000848 BEDA                   BSR         __flagAll
+    0000084A 64E3                   MOV         R14,R4
+          Game.c   334                _drawField(field, -1, -1);
+    0000084C E6FF                   MOV         #-1,R6
+    0000084E 6563                   MOV         R6,R5
+    00000850 BCD6                   BSR         __drawField
+    00000852 64E3                   MOV         R14,R4
+          Game.c   335                Sleep(2000);
+    00000854 D208                   MOV.L       L604+6,R2  ; _Sleep
+    00000856 420B                   JSR         @R2
+    00000858 6483                   MOV         R8,R4
+          Game.c   336                return GAMEND_WIN;
+    0000085A E003                   MOV         #3,R0
+    0000085C              L585:                             
+          Game.c   337            }
+          Game.c   338        }
+          Game.c   339    }
+    0000085C 9109                   MOV.W       L604,R1    ; H'00B4
+    0000085E 3F1C                   ADD         R1,R15
+    00000860 4F26                   LDS.L       @R15+,PR
+    00000862 68F6                   MOV.L       @R15+,R8
+    00000864 69F6                   MOV.L       @R15+,R9
+    00000866 6AF6                   MOV.L       @R15+,R10
+    00000868 6BF6                   MOV.L       @R15+,R11
+    0000086A 6CF6                   MOV.L       @R15+,R12
+    0000086C 6DF6                   MOV.L       @R15+,R13
+    0000086E 000B                   RTS
+    00000870 6EF6                   MOV.L       @R15+,R14
+    00000872              L604:                             
+    00000872 00B4                   .DATA.W     H'00B4
+    00000874 <00000000>             .DATA.L     _Clear
+    00000878 <00000000>             .DATA.L     _Sleep
+C   00000000              L484:
+    00000000 3A202569               .SDATA      ": %i"
+    00000004 00                     .DATA.B     H'00
+    00000005 00000001               .RES.B      1
+    00000006 00000002               .RES.W      1
+    00000008              L485:
+    00000008 436F6E7469             .SDATA      "Continue"
+             6E7565       
+    00000010 0A                     .DATA.B     H'0A
+    00000011 4578697420             .SDATA      "Exit Game"
+             47616D65     
+    0000001A 00                     .DATA.B     H'00
+
+
+
+
+
+
+
+
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 29-Dec-2020 03:00:29  PAGE    1
+
+
+******** STATISTICS INFORMATION ********
+
+
+********** ERROR INFORMATION ***********
+
+NUMBER OF ERRORS:           0
+NUMBER OF WARNINGS:         0
+
+
+
+
+******* SOURCE LINE INFORMATION ********
+
+COMPILED SOURCE LINE:      339
+
+
+
+******* SECTION SIZE INFORMATION *******
+
+PROGRAM  SECTION (P):                               0000087C Byte(s)
+CONSTANT SECTION (C):                               0000001B Byte(s)
+DATA     SECTION (D):                               00000000 Byte(s)
+BSS      SECTION (B):                               00000000 Byte(s)
+
+ TOTAL PROGRAM SIZE: 00000897 Byte(s)
+
+
+
+********** LABEL INFORMATION ***********
+
+NUMBER OF EXTERNAL REFERENCE SYMBOLS:           15
+NUMBER OF EXTERNAL DEFINITION SYMBOLS:          16
+NUMBER OF INTERNAL/EXTERNAL SYMBOLS:           116
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+*** COMMAND PARAMETER ***
+
+
+  -subcommand=C:\DOCUME~1\milky\LOCALS~1\Temp\hmk3ED.tmp 
+

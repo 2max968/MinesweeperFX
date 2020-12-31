@@ -1,0 +1,203 @@
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 28-Dec-2020 14:23:19  PAGE    1
+
+************ OBJECT LISTING ************
+
+FILE NAME: E:\Entwicklung\Casio\SDK\Minesweeper\InfoTexts.c
+
+SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
+
+      InfoTexts.     1    #include "InfoTexts.h"
+      InfoTexts.     2    
+      InfoTexts.     3    char* GetTextHelp()
+P   00000000              _GetTextHelp:                    ; function: GetTextHelp
+                                                           ; frame size=0
+      InfoTexts.     4    {
+      InfoTexts.     5            return "ALPHA:\nUncover field\n\nF1:\nFlag field";
+    00000000 D005                   MOV.L       L253,R0    ; L238
+      InfoTexts.     6    }
+    00000002 000B                   RTS
+    00000004 0009                   NOP
+      InfoTexts.     7    
+      InfoTexts.     8    char* GetTextAbout()
+    00000006              _GetTextAbout:                   ; function: GetTextAbout
+                                                           ; frame size=0
+      InfoTexts.     9    {
+      InfoTexts.    10            return "Minsweeper for\nCASIO fx-9860G\n\nby Max Haag";
+    00000006 D005                   MOV.L       L253+4,R0  ; L240
+      InfoTexts.    11    }
+    00000008 000B                   RTS
+    0000000A 0009                   NOP
+      InfoTexts.    12    
+      InfoTexts.    13    char* GetGameOver()
+    0000000C              _GetGameOver:                    ; function: GetGameOver
+                                                           ; frame size=0
+      InfoTexts.    14    {
+      InfoTexts.    15            return "\nGAME OVER\nA mine exploded";
+    0000000C D004                   MOV.L       L253+8,R0  ; L242
+      InfoTexts.    16    }
+    0000000E 000B                   RTS
+    00000010 0009                   NOP
+      InfoTexts.    17    
+      InfoTexts.    18    char* GetWinText()
+    00000012              _GetWinText:                     ; function: GetWinText
+                                                           ; frame size=0
+      InfoTexts.    19    {
+      InfoTexts.    20            return "\nYou win\nAll mines\ndetected";
+    00000012 D004                   MOV.L       L253+12,R0 ; L244
+      InfoTexts.    21    }
+    00000014 000B                   RTS
+    00000016 0009                   NOP
+    00000018              L253:                             
+    00000018 <00000000>             .DATA.L     L238
+    0000001C <00000000>             .DATA.L     L240
+    00000020 <00000000>             .DATA.L     L242
+    00000024 <00000000>             .DATA.L     L244
+C   00000000              L238:
+    00000000 414C504841             .SDATA      "ALPHA:"
+             3A           
+    00000006 0A                     .DATA.B     H'0A
+    00000007 556E636F76             .SDATA      "Uncover field"
+             6572206669   
+             656C64       
+    00000014 0A0A                   .DATA.B     H'0A,H'0A
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 28-Dec-2020 14:23:19  PAGE    2
+
+
+SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
+
+    00000016 46313A                 .SDATA      "F1:"
+    00000019 0A                     .DATA.B     H'0A
+    0000001A 466C616720             .SDATA      "Flag field"
+             6669656C64   
+    00000024 00                     .DATA.B     H'00
+    00000025 00000001               .RES.B      1
+    00000026 00000002               .RES.W      1
+    00000028              L240:
+    00000028 4D696E7377             .SDATA      "Minsweeper for"
+             6565706572   
+             20666F72     
+    00000036 0A                     .DATA.B     H'0A
+    00000037 434153494F             .SDATA      "CASIO fx-9860G"
+             2066782D39   
+             38363047     
+    00000045 0A0A                   .DATA.B     H'0A,H'0A
+    00000047 6279204D61             .SDATA      "by Max Haag"
+             7820486161   
+             67           
+    00000052 00                     .DATA.B     H'00
+    00000053 00000001               .RES.B      1
+    00000054              L242:
+    00000054 0A                     .DATA.B     H'0A
+    00000055 47414D4520             .SDATA      "GAME OVER"
+             4F564552     
+    0000005E 0A                     .DATA.B     H'0A
+    0000005F 41206D696E             .SDATA      "A mine exploded"
+             6520657870   
+             6C6F646564   
+    0000006E 00                     .DATA.B     H'00
+    0000006F 00000001               .RES.B      1
+    00000070              L244:
+    00000070 0A                     .DATA.B     H'0A
+    00000071 596F752077             .SDATA      "You win"
+             696E         
+    00000078 0A                     .DATA.B     H'0A
+    00000079 416C6C206D             .SDATA      "All mines"
+             696E6573     
+    00000082 0A                     .DATA.B     H'0A
+    00000083 6465746563             .SDATA      "detected"
+             746564       
+    0000008B 00                     .DATA.B     H'00
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 28-Dec-2020 14:23:19  PAGE    1
+
+
+******** STATISTICS INFORMATION ********
+
+
+********** ERROR INFORMATION ***********
+
+NUMBER OF ERRORS:           0
+NUMBER OF WARNINGS:         0
+
+
+
+
+******* SOURCE LINE INFORMATION ********
+
+COMPILED SOURCE LINE:       21
+
+
+
+******* SECTION SIZE INFORMATION *******
+
+PROGRAM  SECTION (P):                               00000028 Byte(s)
+CONSTANT SECTION (C):                               0000008C Byte(s)
+DATA     SECTION (D):                               00000000 Byte(s)
+BSS      SECTION (B):                               00000000 Byte(s)
+
+ TOTAL PROGRAM SIZE: 000000B4 Byte(s)
+
+
+
+********** LABEL INFORMATION ***********
+
+NUMBER OF EXTERNAL REFERENCE SYMBOLS:            0
+NUMBER OF EXTERNAL DEFINITION SYMBOLS:           4
+NUMBER OF INTERNAL/EXTERNAL SYMBOLS:             9
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+*** COMMAND PARAMETER ***
+
+
+  -subcommand=C:\DOCUME~1\milky\LOCALS~1\Temp\hmk38E.tmp 
+
