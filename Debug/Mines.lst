@@ -1,4 +1,4 @@
-SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 29-Dec-2020 02:38:20  PAGE    1
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 01-Jan-2021 15:27:45  PAGE    1
 
 ************ OBJECT LISTING ************
 
@@ -21,415 +21,473 @@ SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
          Mines.c    13    #include "Game.h"
          Mines.c    14    #include "Mines.h"
          Mines.c    15    #include "Graphics.h"
-         Mines.c    16    #include <stdio.h>
-         Mines.c    17    
-         Mines.c    18    #define STATE_MAINMENU 0
-         Mines.c    19    #define STATE_DIFFMENU 1
-         Mines.c    20    #define STATE_HELP 2
-         Mines.c    21    #define STATE_ABOUT 3
-         Mines.c    22    #define STATE_GAME 4
-         Mines.c    23    #define STATE_LOOSE 5
-         Mines.c    24    #define STATE_WIN 6
-         Mines.c    25    #define STATE_CUSTOMGAME 7
-         Mines.c    26    
-         Mines.c    27    int AddIn_main(int isAppli, unsigned short OptionNum)
-P   00000000              _AddIn_main:                     ; function: AddIn_main
-                                                           ; frame size=4
-         Mines.c    28    {
-         Mines.c    29        int res;
-         Mines.c    30            int state = STATE_MAINMENU;
-         Mines.c    31            unsigned int key;
-         Mines.c    32            int difficulty;
-         Mines.c    33            uchar gameResult;
+         Mines.c    16    #include "timer.h"
+         Mines.c    17    #include <stdio.h>
+         Mines.c    18    #include "rand.h"
+         Mines.c    19    
+         Mines.c    20    #define STATE_MAINMENU 0
+         Mines.c    21    #define STATE_DIFFMENU 1
+         Mines.c    22    #define STATE_HELP 2
+         Mines.c    23    #define STATE_ABOUT 3
+         Mines.c    24    #define STATE_GAME 4
+         Mines.c    25    #define STATE_LOOSE 5
+         Mines.c    26    #define STATE_WIN 6
+         Mines.c    27    #define STATE_CUSTOMGAME 7
+         Mines.c    28    #define STATE_MAINMENU2 8
+         Mines.c    29    
+         Mines.c    30    #define RTIMER SetTimer(ID_USER_TIMER1, 1, randomSeedTimer)
+         Mines.c    31    #define KTIMER KillTimer(ID_USER_TIMER1)
+         Mines.c    32    
+         Mines.c    33    unsigned int millis;
          Mines.c    34    
-         Mines.c    35        Bdisp_AllClr_DDVRAM();
-    00000000 D352                   MOV.L       L449,R3    ; _Bdisp_AllClr_DDVRAM
-    00000002 7FFC                   ADD         #-4,R15
-    00000004 EA00                   MOV         #0,R10
-    00000006 430B                   JSR         @R3
-    00000008 6EA3                   MOV         R10,R14
-         Mines.c    36    
-         Mines.c    37        while(1)
-    0000000A              L425:                             
-         Mines.c    38        {
-         Mines.c    39                    switch(state)
-    0000000A EB04                   MOV         #4,R11
-    0000000C DD51                   MOV.L       L449+8,R13 ; _ShowText
-    0000000E 60E3                   MOV         R14,R0
-    00000010 D94F                   MOV.L       L449+4,R9  ; _ShowMenu
-    00000012 8800                   CMP/EQ      #0,R0
-    00000014 8D10                   BT/S        L392
-    00000016 EC01                   MOV         #1,R12
+         Mines.c    35    void randomSeedTimer()
+P   00000000              _randomSeedTimer:                ; function: randomSeedTimer
+                                                           ; frame size=0
+         Mines.c    36    {
+         Mines.c    37            millis++;
+    00000000 D45D                   MOV.L       L456,R4    ; _millis
+    00000002 6342                   MOV.L       @R4,R3
+    00000004 7301                   ADD         #1,R3
+         Mines.c    38    }
+    00000006 000B                   RTS
+    00000008 2432                   MOV.L       R3,@R4
+         Mines.c    39    
+         Mines.c    40    int AddIn_main(int isAppli, unsigned short OptionNum)
+    0000000A              _AddIn_main:                     ; function: AddIn_main
+                                                           ; frame size=4
+    0000000A 7FFC                   ADD         #-4,R15
+         Mines.c    41    {
+         Mines.c    42        int res;
+         Mines.c    43            int state = STATE_MAINMENU;
+         Mines.c    44            unsigned int key;
 
 
 
 
-SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 29-Dec-2020 02:38:20  PAGE    2
-
-
-SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
-
-    00000018 8801                   CMP/EQ      #1,R0
-    0000001A 8923                   BT          L394
-    0000001C 8802                   CMP/EQ      #2,R0
-    0000001E 893E                   BT          L400
-    00000020 8803                   CMP/EQ      #3,R0
-    00000022 8943                   BT          L401
-    00000024 8804                   CMP/EQ      #4,R0
-    00000026 8948                   BT          L402
-    00000028 8805                   CMP/EQ      #5,R0
-    0000002A 895A                   BT          L403
-    0000002C 8806                   CMP/EQ      #6,R0
-    0000002E 895F                   BT          L404
-    00000030 8807                   CMP/EQ      #7,R0
-    00000032 8964                   BT          L405
-    00000034 AFE9                   BRA         L425
-    00000036 0009                   NOP
-    00000038              L392:                            ; case label 
-         Mines.c    40                    {
-         Mines.c    41                    case STATE_MAINMENU:
-         Mines.c    42                            FillDotted();
-    00000038 DD47                   MOV.L       L449+12,R13; _FillDotted
-    0000003A 4D0B                   JSR         @R13
-    0000003C 0009                   NOP
-         Mines.c    43                            res = ShowMenu(0, "Start Game\nHelp\nAbout");
-    0000003E DD47                   MOV.L       L449+16,R13; L361
-    00000040 65D3                   MOV         R13,R5
-    00000042 490B                   JSR         @R9
-    00000044 E400                   MOV         #0,R4
-    00000046 6403                   MOV         R0,R4
-         Mines.c    44                            if(res == 0) state = STATE_DIFFMENU;
-    00000048 2448                   TST         R4,R4
-    0000004A 8F01                   BF/S        L427
-         Mines.c    45                            if(res == 1) state = STATE_HELP;
-    0000004C 6043                   MOV         R4,R0
-    0000004E 6EC3                   MOV         R12,R14
-    00000050              L427:                             
-    00000050 8801                   CMP/EQ      #1,R0
-    00000052 8F02                   BF/S        L428
-         Mines.c    46                            if(res == 2) state = STATE_ABOUT;
-    00000054 6043                   MOV         R4,R0
-    00000056 E502                   MOV         #2,R5
-    00000058 6E53                   MOV         R5,R14
-    0000005A              L428:                             
-    0000005A 8802                   CMP/EQ      #2,R0
-    0000005C 8BD5                   BF          L425
-    0000005E E403                   MOV         #3,R4
-         Mines.c    47                            break;
-    00000060 AFD3                   BRA         L425
-    00000062 6E43                   MOV         R4,R14
-    00000064              L394:                            ; case label 
-         Mines.c    48                    case STATE_DIFFMENU:
-         Mines.c    49                            res = ShowMenu(1, "10 - Mines\n15 - Mines\n20 - Mines\nCustom Game");
-    00000064 DE3E                   MOV.L       L449+20,R14; L362
-    00000066 65E3                   MOV         R14,R5
-    00000068 490B                   JSR         @R9
-    0000006A E401                   MOV         #1,R4
-         Mines.c    50                            if(res == -1) state = STATE_MAINMENU;
-
-
-
-
-SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 29-Dec-2020 02:38:20  PAGE    3
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 01-Jan-2021 15:27:45  PAGE    2
 
 
 SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
 
-    0000006C 88FF                   CMP/EQ      #-1,R0
-    0000006E 8D44                   BT/S        L391
-    00000070 6403                   MOV         R0,R4
-         Mines.c    51                            else
-         Mines.c    52                            {
-         Mines.c    53                                    state = STATE_GAME;
-         Mines.c    54                                    switch(res)
-    00000072 6043                   MOV         R4,R0
-    00000074 8800                   CMP/EQ      #0,R0
-    00000076 8D08                   BT/S        L396
-    00000078 6EB3                   MOV         R11,R14
-    0000007A 8801                   CMP/EQ      #1,R0
-    0000007C 8907                   BT          L397
-    0000007E 8802                   CMP/EQ      #2,R0
-    00000080 8907                   BT          L398
-    00000082 8803                   CMP/EQ      #3,R0
-    00000084 8908                   BT          L399
-    00000086 AFC0                   BRA         L425
-    00000088 0009                   NOP
-    0000008A              L396:                            ; case label 
-         Mines.c    55                                    {
-         Mines.c    56                                            case 0: difficulty = 10; break;
-    0000008A A003                   BRA         L446
-    0000008C E40A                   MOV         #10,R4
-    0000008E              L397:                            ; case label 
-         Mines.c    57                                            case 1: difficulty = 15; break;
-    0000008E A001                   BRA         L446
-    00000090 E40F                   MOV         #15,R4
-    00000092              L398:                            ; case label 
-         Mines.c    58                                            case 2: difficulty = 20; break;
-    00000092 E414                   MOV         #20,R4
-    00000094              L446:                             
-    00000094 AFB9                   BRA         L425
-    00000096 2F42                   MOV.L       R4,@R15
-    00000098              L399:                            ; case label 
-         Mines.c    59                                            case 3: state = STATE_CUSTOMGAME; break;
-    00000098 E407                   MOV         #7,R4
-         Mines.c    60                                    }
-         Mines.c    61                            }
-         Mines.c    62                            break;
-    0000009A AFB6                   BRA         L425
-    0000009C 6E43                   MOV         R4,R14
-    0000009E              L400:                            ; case label 
-         Mines.c    63                    case STATE_HELP:
-         Mines.c    64                            ShowText(GetTextHelp());
-    0000009E DE31                   MOV.L       L449+24,R14; _GetTextHelp
-    000000A0 4E0B                   JSR         @R14
-    000000A2 0009                   NOP
-    000000A4 4D0B                   JSR         @R13
-    000000A6 6403                   MOV         R0,R4
-    000000A8 A027                   BRA         L391
-    000000AA 0009                   NOP
-    000000AC              L401:                            ; case label 
-         Mines.c    65                            state = STATE_MAINMENU;
-         Mines.c    66                            break;
-         Mines.c    67                    case STATE_ABOUT:
-         Mines.c    68                            ShowText(GetTextAbout());
+         Mines.c    45            int difficulty;
+         Mines.c    46            uchar gameResult;
+         Mines.c    47    
+         Mines.c    48        Bdisp_AllClr_DDVRAM();
+    0000000C D35B                   MOV.L       L456+4,R3  ; _Bdisp_AllClr_DDVRAM
+    0000000E EA00                   MOV         #0,R10
+    00000010 430B                   JSR         @R3
+    00000012 6EA3                   MOV         R10,R14
+         Mines.c    49    
+         Mines.c    50        while(1)
+    00000014              L432:                             
+         Mines.c    51        {
+         Mines.c    52                    switch(state)
+    00000014 D85A                   MOV.L       L456+8,R8  ; _KillTimer
+    00000016 EB04                   MOV         #4,R11
+    00000018 DD5B                   MOV.L       L456+16,R13; _ShowText
+    0000001A 60E3                   MOV         R14,R0
+    0000001C D959                   MOV.L       L456+12,R9 ; _ShowMenu
+    0000001E 8800                   CMP/EQ      #0,R0
+    00000020 8D12                   BT/S        L398
+    00000022 EC01                   MOV         #1,R12
+    00000024 8808                   CMP/EQ      #8,R0
+    00000026 8912                   BT          L399
+    00000028 8801                   CMP/EQ      #1,R0
+    0000002A 8926                   BT          L401
+    0000002C 8802                   CMP/EQ      #2,R0
+    0000002E 8946                   BT          L407
+    00000030 8803                   CMP/EQ      #3,R0
+    00000032 894B                   BT          L408
+    00000034 8804                   CMP/EQ      #4,R0
+    00000036 8950                   BT          L409
+    00000038 8805                   CMP/EQ      #5,R0
+    0000003A 8968                   BT          L410
+    0000003C 8806                   CMP/EQ      #6,R0
+    0000003E 896D                   BT          L411
+    00000040 8807                   CMP/EQ      #7,R0
+    00000042 8972                   BT          L412
+    00000044 AFE6                   BRA         L432
+    00000046 0009                   NOP
+    00000048              L398:                            ; case label 
+         Mines.c    53                    {
+         Mines.c    54                    case STATE_MAINMENU:
+         Mines.c    55                            state = STATE_MAINMENU2;
+    00000048 EE08                   MOV         #8,R14
+         Mines.c    56                            KTIMER;
+    0000004A 480B                   JSR         @R8
+    0000004C E401                   MOV         #1,R4
+         Mines.c    57                    case STATE_MAINMENU2:
+    0000004E              L399:                            ; case label 
+         Mines.c    58                            FillDotted();
+    0000004E DD4F                   MOV.L       L456+20,R13; _FillDotted
+    00000050 4D0B                   JSR         @R13
+    00000052 0009                   NOP
+         Mines.c    59                            res = ShowMenu(0, "Start Game\nHelp\nAbout");
+    00000054 DD4E                   MOV.L       L456+24,R13; L367
+    00000056 65D3                   MOV         R13,R5
+    00000058 490B                   JSR         @R9
 
 
 
 
-SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 29-Dec-2020 02:38:20  PAGE    4
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 01-Jan-2021 15:27:45  PAGE    3
 
 
 SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
 
-    000000AC DE2E                   MOV.L       L449+28,R14; _GetTextAbout
-    000000AE 4E0B                   JSR         @R14
-    000000B0 0009                   NOP
-    000000B2 4D0B                   JSR         @R13
-    000000B4 6403                   MOV         R0,R4
-    000000B6 A020                   BRA         L391
-    000000B8 0009                   NOP
-    000000BA              L402:                            ; case label 
-         Mines.c    69                            state = STATE_MAINMENU;
-         Mines.c    70                            break;
-         Mines.c    71                    case STATE_GAME:
-         Mines.c    72                            gameResult = RunGame(difficulty);
-    000000BA DD2C                   MOV.L       L449+32,R13; _RunGame
-    000000BC 4D0B                   JSR         @R13
-    000000BE 64F2                   MOV.L       @R15,R4
-    000000C0 6503                   MOV         R0,R5
-    000000C2 645C                   EXTU.B      R5,R4
-    000000C4 6043                   MOV         R4,R0
-    000000C6 8802                   CMP/EQ      #2,R0
-    000000C8 8B01                   BF          L433
-         Mines.c    73                            if(gameResult == GAMEND_LOOSE)
-         Mines.c    74                                    state = STATE_LOOSE;
-    000000CA A003                   BRA         L447
-    000000CC E405                   MOV         #5,R4
-    000000CE              L433:                             
-         Mines.c    75                            else if(gameResult == GAMEND_WIN)
-    000000CE 8803                   CMP/EQ      #3,R0
-    000000D0 8B02                   BF          L435
-         Mines.c    76                                    state = STATE_WIN;
-    000000D2 E406                   MOV         #6,R4
-    000000D4              L447:                             
-    000000D4 AF99                   BRA         L425
-    000000D6 6E43                   MOV         R4,R14
-    000000D8              L435:                             
-         Mines.c    77                            else if(gameResult == GAMEND_USEREXIT)
-    000000D8 6043                   MOV         R4,R0
-    000000DA 8801                   CMP/EQ      #1,R0
-    000000DC 8B95                   BF          L425
-    000000DE A00C                   BRA         L391
-    000000E0 0009                   NOP
-    000000E2              L403:                            ; case label 
-         Mines.c    78                                    state = STATE_MAINMENU;
+    0000005A E400                   MOV         #0,R4
+    0000005C 6403                   MOV         R0,R4
+         Mines.c    60                            if(res == 0) state = STATE_DIFFMENU;
+    0000005E 2448                   TST         R4,R4
+    00000060 8F01                   BF/S        L434
+         Mines.c    61                            if(res == 1) state = STATE_HELP;
+    00000062 6043                   MOV         R4,R0
+    00000064 6EC3                   MOV         R12,R14
+    00000066              L434:                             
+    00000066 8801                   CMP/EQ      #1,R0
+    00000068 8F02                   BF/S        L435
+         Mines.c    62                            if(res == 2) state = STATE_ABOUT;
+    0000006A 6043                   MOV         R4,R0
+    0000006C E502                   MOV         #2,R5
+    0000006E 6E53                   MOV         R5,R14
+    00000070              L435:                             
+    00000070 8802                   CMP/EQ      #2,R0
+    00000072 8BCF                   BF          L432
+    00000074 E403                   MOV         #3,R4
+         Mines.c    63                            break;
+    00000076 AFCD                   BRA         L432
+    00000078 6E43                   MOV         R4,R14
+    0000007A              L401:                            ; case label 
+         Mines.c    64                    case STATE_DIFFMENU:
+         Mines.c    65                            RTIMER;
+    0000007A E501                   MOV         #1,R5
+    0000007C DE45                   MOV.L       L456+28,R14; _SetTimer
+    0000007E D646                   MOV.L       L456+32,R6 ; _randomSeedTimer
+    00000080 4E0B                   JSR         @R14
+    00000082 6453                   MOV         R5,R4
+         Mines.c    66                            res = ShowMenu(1, "10 - Mines\n15 - Mines\n20 - Mines\nCustom Game");
+    00000084 DE45                   MOV.L       L456+36,R14; L368
+    00000086 65E3                   MOV         R14,R5
+    00000088 490B                   JSR         @R9
+    0000008A E401                   MOV         #1,R4
+         Mines.c    67                            if(res == -1) state = STATE_MAINMENU;
+    0000008C 88FF                   CMP/EQ      #-1,R0
+    0000008E 8D4A                   BT/S        L397
+    00000090 6403                   MOV         R0,R4
+         Mines.c    68                            else
+         Mines.c    69                            {
+         Mines.c    70                                    state = STATE_GAME;
+         Mines.c    71                                    switch(res)
+    00000092 6043                   MOV         R4,R0
+    00000094 8800                   CMP/EQ      #0,R0
+    00000096 8D08                   BT/S        L403
+    00000098 6EB3                   MOV         R11,R14
+    0000009A 8801                   CMP/EQ      #1,R0
+    0000009C 8907                   BT          L404
+    0000009E 8802                   CMP/EQ      #2,R0
+    000000A0 8907                   BT          L405
+    000000A2 8803                   CMP/EQ      #3,R0
+    000000A4 8908                   BT          L406
+    000000A6 AFB5                   BRA         L432
+    000000A8 0009                   NOP
+    000000AA              L403:                            ; case label 
+         Mines.c    72                                    {
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 01-Jan-2021 15:27:45  PAGE    4
+
+
+SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
+
+         Mines.c    73                                            case 0: difficulty = 10; break;
+    000000AA A003                   BRA         L453
+    000000AC E40A                   MOV         #10,R4
+    000000AE              L404:                            ; case label 
+         Mines.c    74                                            case 1: difficulty = 15; break;
+    000000AE A001                   BRA         L453
+    000000B0 E40F                   MOV         #15,R4
+    000000B2              L405:                            ; case label 
+         Mines.c    75                                            case 2: difficulty = 20; break;
+    000000B2 E414                   MOV         #20,R4
+    000000B4              L453:                             
+    000000B4 AFAE                   BRA         L432
+    000000B6 2F42                   MOV.L       R4,@R15
+    000000B8              L406:                            ; case label 
+         Mines.c    76                                            case 3: state = STATE_CUSTOMGAME; break;
+    000000B8 E407                   MOV         #7,R4
+         Mines.c    77                                    }
+         Mines.c    78                            }
          Mines.c    79                            break;
-         Mines.c    80                    case STATE_LOOSE:
-         Mines.c    81                            ShowText(GetGameOver());
-    000000E2 DE23                   MOV.L       L449+36,R14; _GetGameOver
-    000000E4 4E0B                   JSR         @R14
-    000000E6 0009                   NOP
-    000000E8 4D0B                   JSR         @R13
-    000000EA 6403                   MOV         R0,R4
-    000000EC A005                   BRA         L391
-    000000EE 0009                   NOP
-    000000F0              L404:                            ; case label 
+    000000BA AFAB                   BRA         L432
+    000000BC 6E43                   MOV         R4,R14
+    000000BE              L407:                            ; case label 
+         Mines.c    80                    case STATE_HELP:
+         Mines.c    81                            ShowText(GetTextHelp());
+    000000BE DE38                   MOV.L       L456+40,R14; _GetTextHelp
+    000000C0 4E0B                   JSR         @R14
+    000000C2 0009                   NOP
+    000000C4 4D0B                   JSR         @R13
+    000000C6 6403                   MOV         R0,R4
+    000000C8 A02D                   BRA         L397
+    000000CA 0009                   NOP
+    000000CC              L408:                            ; case label 
          Mines.c    82                            state = STATE_MAINMENU;
          Mines.c    83                            break;
-         Mines.c    84                    case STATE_WIN:
-         Mines.c    85                            ShowText(GetWinText());
-
-
-
-
-SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 29-Dec-2020 02:38:20  PAGE    5
-
-
-SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
-
-    000000F0 DE20                   MOV.L       L449+40,R14; _GetWinText
-    000000F2 4E0B                   JSR         @R14
-    000000F4 0009                   NOP
-    000000F6 4D0B                   JSR         @R13
-    000000F8 6403                   MOV         R0,R4
-    000000FA              L391:
+         Mines.c    84                    case STATE_ABOUT:
+         Mines.c    85                            ShowText(GetTextAbout());
+    000000CC DE35                   MOV.L       L456+44,R14; _GetTextAbout
+    000000CE 4E0B                   JSR         @R14
+    000000D0 0009                   NOP
+    000000D2 4D0B                   JSR         @R13
+    000000D4 6403                   MOV         R0,R4
+    000000D6 A026                   BRA         L397
+    000000D8 0009                   NOP
+    000000DA              L409:                            ; case label 
          Mines.c    86                            state = STATE_MAINMENU;
          Mines.c    87                            break;
-    000000FA AF86                   BRA         L425
-    000000FC 6EA3                   MOV         R10,R14
-    000000FE              L405:                            ; case label 
-         Mines.c    88                    case STATE_CUSTOMGAME:
-         Mines.c    89                            PopUpWin(5);
-    000000FE D91E                   MOV.L       L449+44,R9 ; _PopUpWin
-    00000100 490B                   JSR         @R9
-    00000102 E405                   MOV         #5,R4
-         Mines.c    90                            locate(3,3);
-    00000104 D91D                   MOV.L       L449+48,R9 ; _locate
-    00000106 E503                   MOV         #3,R5
-    00000108 490B                   JSR         @R9
-    0000010A 6453                   MOV         R5,R4
-         Mines.c    91                            Print((uchar*)"Number of mines:");
-    0000010C D81C                   MOV.L       L449+52,R8 ; _Print
-    0000010E D41D                   MOV.L       L449+56,R4 ; L365
-    00000110 480B                   JSR         @R8
+         Mines.c    88                    case STATE_GAME:
+         Mines.c    89                            KTIMER;
+    000000DA 480B                   JSR         @R8
+    000000DC E401                   MOV         #1,R4
+         Mines.c    90                            mysrand(millis);
+    000000DE DC26                   MOV.L       L456,R12   ; _millis
+    000000E0 DD31                   MOV.L       L456+48,R13; _mysrand
+    000000E2 4D0B                   JSR         @R13
+    000000E4 64C2                   MOV.L       @R12,R4
+         Mines.c    91                            gameResult = RunGame(difficulty);
+    000000E6 DD31                   MOV.L       L456+52,R13; _RunGame
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 01-Jan-2021 15:27:45  PAGE    5
+
+
+SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
+
+    000000E8 4D0B                   JSR         @R13
+    000000EA 64F2                   MOV.L       @R15,R4
+    000000EC 6503                   MOV         R0,R5
+    000000EE 645C                   EXTU.B      R5,R4
+    000000F0 6043                   MOV         R4,R0
+    000000F2 8802                   CMP/EQ      #2,R0
+    000000F4 8B01                   BF          L440
+         Mines.c    92                            if(gameResult == GAMEND_LOOSE)
+         Mines.c    93                                    state = STATE_LOOSE;
+    000000F6 A003                   BRA         L454
+    000000F8 E405                   MOV         #5,R4
+    000000FA              L440:                             
+         Mines.c    94                            else if(gameResult == GAMEND_WIN)
+    000000FA 8803                   CMP/EQ      #3,R0
+    000000FC 8B02                   BF          L442
+         Mines.c    95                                    state = STATE_WIN;
+    000000FE E406                   MOV         #6,R4
+    00000100              L454:                             
+    00000100 AF88                   BRA         L432
+    00000102 6E43                   MOV         R4,R14
+    00000104              L442:                             
+         Mines.c    96                            else if(gameResult == GAMEND_USEREXIT)
+    00000104 6043                   MOV         R4,R0
+    00000106 8801                   CMP/EQ      #1,R0
+    00000108 8B84                   BF          L432
+    0000010A A00C                   BRA         L397
+    0000010C 0009                   NOP
+    0000010E              L410:                            ; case label 
+         Mines.c    97                                    state = STATE_MAINMENU;
+         Mines.c    98                            break;
+         Mines.c    99                    case STATE_LOOSE:
+         Mines.c   100                            ShowText(GetGameOver());
+    0000010E DE28                   MOV.L       L456+56,R14; _GetGameOver
+    00000110 4E0B                   JSR         @R14
     00000112 0009                   NOP
-         Mines.c    92                            if(!ReadInt(&difficulty, 3, 3, 4))
-    00000114 D91C                   MOV.L       L449+60,R9 ; _ReadInt
-    00000116 E704                   MOV         #4,R7
-    00000118 E603                   MOV         #3,R6
-    0000011A 6563                   MOV         R6,R5
-    0000011C 490B                   JSR         @R9
-    0000011E 64F3                   MOV         R15,R4
-    00000120 600C                   EXTU.B      R0,R0
-    00000122 2008                   TST         R0,R0
-    00000124 8B01                   BF          L438
-         Mines.c    93                            {
-         Mines.c    94                                    state = STATE_DIFFMENU;
-         Mines.c    95                                    break;
-    00000126 AF70                   BRA         L425
-    00000128 6EC3                   MOV         R12,R14
-    0000012A              L438:                             
-         Mines.c    96                            }
-         Mines.c    97                            if(difficulty < 1)
-    0000012A 62F2                   MOV.L       @R15,R2
-    0000012C 32C3                   CMP/GE      R12,R2
-    0000012E 8902                   BT          L439
-         Mines.c    98                            {
-         Mines.c    99                                    ShowText("\nYou need at\nleast 1 mine.");
-    00000130 DC16                   MOV.L       L449+64,R12; L368
-    00000132 A005                   BRA         L448
-    00000134 0009                   NOP
-    00000136              L439:                             
-         Mines.c   100                            }
-         Mines.c   101                            else if(difficulty > 127)
-    00000136 E47F                   MOV         #127,R4
-    00000138 63F2                   MOV.L       @R15,R3
+    00000114 4D0B                   JSR         @R13
+    00000116 6403                   MOV         R0,R4
+    00000118 A005                   BRA         L397
+    0000011A 0009                   NOP
+    0000011C              L411:                            ; case label 
+         Mines.c   101                            state = STATE_MAINMENU;
+         Mines.c   102                            break;
+         Mines.c   103                    case STATE_WIN:
+         Mines.c   104                            ShowText(GetWinText());
+    0000011C DE25                   MOV.L       L456+60,R14; _GetWinText
+    0000011E 4E0B                   JSR         @R14
+    00000120 0009                   NOP
+    00000122 4D0B                   JSR         @R13
+    00000124 6403                   MOV         R0,R4
+    00000126              L397:
+         Mines.c   105                            state = STATE_MAINMENU;
+         Mines.c   106                            break;
+    00000126 AF75                   BRA         L432
+    00000128 6EA3                   MOV         R10,R14
+    0000012A              L412:                            ; case label 
+         Mines.c   107                    case STATE_CUSTOMGAME:
+         Mines.c   108                            PopUpWin(5);
 
 
 
 
-SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 29-Dec-2020 02:38:20  PAGE    6
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 01-Jan-2021 15:27:45  PAGE    6
 
 
 SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
 
-    0000013A 3347                   CMP/GT      R4,R3
-    0000013C 8B04                   BF          L441
-         Mines.c   102                            {
-         Mines.c   103                                    ShowText("\nYou can only\nplace 127 mines.");
-    0000013E DC14                   MOV.L       L449+68,R12; L370
-    00000140              L448:                             
-    00000140 4D0B                   JSR         @R13
-    00000142 64C3                   MOV         R12,R4
-    00000144 AF61                   BRA         L425
-    00000146 0009                   NOP
-    00000148              L441:                             
-    00000148 AF5F                   BRA         L425
-         Mines.c   104                            }
-         Mines.c   105                            else
-         Mines.c   106                            {
-         Mines.c   107                                    state = STATE_GAME;
-    0000014A 6EB3                   MOV         R11,R14
-    0000014C              L449:                             
-    0000014C <00000000>             .DATA.L     _Bdisp_AllClr_DDVRAM
-    00000150 <00000000>             .DATA.L     _ShowMenu
-    00000154 <00000000>             .DATA.L     _ShowText
-    00000158 <00000000>             .DATA.L     _FillDotted
-    0000015C <00000000>             .DATA.L     L361
-    00000160 <00000000>             .DATA.L     L362
-    00000164 <00000000>             .DATA.L     _GetTextHelp
-    00000168 <00000000>             .DATA.L     _GetTextAbout
-    0000016C <00000000>             .DATA.L     _RunGame
-    00000170 <00000000>             .DATA.L     _GetGameOver
-    00000174 <00000000>             .DATA.L     _GetWinText
-    00000178 <00000000>             .DATA.L     _PopUpWin
-    0000017C <00000000>             .DATA.L     _locate
-    00000180 <00000000>             .DATA.L     _Print
-    00000184 <00000000>             .DATA.L     L365
-    00000188 <00000000>             .DATA.L     _ReadInt
-    0000018C <00000000>             .DATA.L     L368
-    00000190 <00000000>             .DATA.L     L370
-         Mines.c   108                            }
-         Mines.c   109                            break;
-         Mines.c   110                    }
-         Mines.c   111        }
-         Mines.c   112    
-         Mines.c   113        return 1;
-         Mines.c   114    }
-         Mines.c   115    
-         Mines.c   116    
-         Mines.c   117    
-         Mines.c   118    
-         Mines.c   119    //****************************************************************************
-         Mines.c   120    //**************                                              ****************
-         Mines.c   121    //**************                 Notice!                      ****************
-         Mines.c   122    //**************                                              ****************
-         Mines.c   123    //**************  Please do not change the following source.  ****************
-         Mines.c   124    //**************                                              ****************
-         Mines.c   125    //****************************************************************************
-         Mines.c   126    
-         Mines.c   127    
-         Mines.c   128    #pragma section _BR_Size
+    0000012A D923                   MOV.L       L456+64,R9 ; _PopUpWin
+    0000012C 490B                   JSR         @R9
+    0000012E E405                   MOV         #5,R4
+         Mines.c   109                            locate(3,3);
+    00000130 D922                   MOV.L       L456+68,R9 ; _locate
+    00000132 E503                   MOV         #3,R5
+    00000134 490B                   JSR         @R9
+    00000136 6453                   MOV         R5,R4
+         Mines.c   110                            Print((uchar*)"Number of mines:");
+    00000138 D821                   MOV.L       L456+72,R8 ; _Print
+    0000013A D422                   MOV.L       L456+76,R4 ; L371
+    0000013C 480B                   JSR         @R8
+    0000013E 0009                   NOP
+         Mines.c   111                            if(!ReadInt(&difficulty, 3, 3, 4))
+    00000140 D921                   MOV.L       L456+80,R9 ; _ReadInt
+    00000142 E704                   MOV         #4,R7
+    00000144 E603                   MOV         #3,R6
+    00000146 6563                   MOV         R6,R5
+    00000148 490B                   JSR         @R9
+    0000014A 64F3                   MOV         R15,R4
+    0000014C 600C                   EXTU.B      R0,R0
+    0000014E 2008                   TST         R0,R0
+    00000150 8B01                   BF          L445
+         Mines.c   112                            {
+         Mines.c   113                                    state = STATE_DIFFMENU;
+         Mines.c   114                                    break;
+    00000152 AF5F                   BRA         L432
+    00000154 6EC3                   MOV         R12,R14
+    00000156              L445:                             
+         Mines.c   115                            }
+         Mines.c   116                            if(difficulty < 1)
+    00000156 62F2                   MOV.L       @R15,R2
+    00000158 32C3                   CMP/GE      R12,R2
+    0000015A 8902                   BT          L446
+         Mines.c   117                            {
+         Mines.c   118                                    ShowText("\nYou need at\nleast 1 mine.");
+    0000015C DC1B                   MOV.L       L456+84,R12; L374
+    0000015E A005                   BRA         L455
+    00000160 0009                   NOP
+    00000162              L446:                             
+         Mines.c   119                            }
+         Mines.c   120                            else if(difficulty > 127)
+    00000162 E47F                   MOV         #127,R4
+    00000164 63F2                   MOV.L       @R15,R3
+    00000166 3347                   CMP/GT      R4,R3
+    00000168 8B04                   BF          L448
+         Mines.c   121                            {
+         Mines.c   122                                    ShowText("\nYou can only\nplace 127 mines.");
+    0000016A DC19                   MOV.L       L456+88,R12; L376
+    0000016C              L455:                             
+    0000016C 4D0B                   JSR         @R13
+    0000016E 64C3                   MOV         R12,R4
+    00000170 AF50                   BRA         L432
+    00000172 0009                   NOP
+    00000174              L448:                             
+    00000174 AF4E                   BRA         L432
+         Mines.c   123                            }
 
 
 
 
-SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 29-Dec-2020 02:38:20  PAGE    7
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 01-Jan-2021 15:27:45  PAGE    7
 
 
 SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
 
-         Mines.c   129    unsigned long BR_Size;
-         Mines.c   130    #pragma section
+         Mines.c   124                            else
+         Mines.c   125                            {
+         Mines.c   126                                    state = STATE_GAME;
+    00000176 6EB3                   MOV         R11,R14
+    00000178              L456:                             
+    00000178 <00000000>             .DATA.L     _millis
+    0000017C <00000000>             .DATA.L     _Bdisp_AllClr_DDVRAM
+    00000180 <00000000>             .DATA.L     _KillTimer
+    00000184 <00000000>             .DATA.L     _ShowMenu
+    00000188 <00000000>             .DATA.L     _ShowText
+    0000018C <00000000>             .DATA.L     _FillDotted
+    00000190 <00000000>             .DATA.L     L367
+    00000194 <00000000>             .DATA.L     _SetTimer
+    00000198 <00000000>             .DATA.L     _randomSeedTimer
+    0000019C <00000000>             .DATA.L     L368
+    000001A0 <00000000>             .DATA.L     _GetTextHelp
+    000001A4 <00000000>             .DATA.L     _GetTextAbout
+    000001A8 <00000000>             .DATA.L     _mysrand
+    000001AC <00000000>             .DATA.L     _RunGame
+    000001B0 <00000000>             .DATA.L     _GetGameOver
+    000001B4 <00000000>             .DATA.L     _GetWinText
+    000001B8 <00000000>             .DATA.L     _PopUpWin
+    000001BC <00000000>             .DATA.L     _locate
+    000001C0 <00000000>             .DATA.L     _Print
+    000001C4 <00000000>             .DATA.L     L371
+    000001C8 <00000000>             .DATA.L     _ReadInt
+    000001CC <00000000>             .DATA.L     L374
+    000001D0 <00000000>             .DATA.L     L376
+         Mines.c   127                            }
+         Mines.c   128                            break;
+         Mines.c   129                    }
+         Mines.c   130        }
          Mines.c   131    
-         Mines.c   132    
-         Mines.c   133    #pragma section _TOP
+         Mines.c   132        return 1;
+         Mines.c   133    }
          Mines.c   134    
-         Mines.c   135    //****************************************************************************
-         Mines.c   136    //  InitializeSystem
-         Mines.c   137    //
-         Mines.c   138    //  param   :   isAppli   : 1 = Application / 0 = eActivity
-         Mines.c   139    //              OptionNum : Option Number (only eActivity)
-         Mines.c   140    //
-         Mines.c   141    //  retval  :   1 = No error / 0 = Error
-         Mines.c   142    //
-         Mines.c   143    //****************************************************************************
-         Mines.c   144    int InitializeSystem(int isAppli, unsigned short OptionNum)
-P_T 00000000              _InitializeSystem:               ; function: InitializeSystem
-                                                           ; frame size=0
-         Mines.c   145    {
-         Mines.c   146        return INIT_ADDIN_APPLICATION(isAppli, OptionNum);
-    00000000 D301                   MOV.L       L450+2,R3  ; _INIT_ADDIN_APPLICATION
-    00000002 432B                   JMP         @R3
-    00000004 0009                   NOP
-    00000006              L450:                             
-    00000006 0000                   .DATA.W     0
-    00000008 <00000000>             .DATA.L     _INIT_ADDIN_APPLICATION
-         Mines.c   147    }
-         Mines.c   148    
+         Mines.c   135    
+         Mines.c   136    
+         Mines.c   137    
+         Mines.c   138    //****************************************************************************
+         Mines.c   139    //**************                                              ****************
+         Mines.c   140    //**************                 Notice!                      ****************
+         Mines.c   141    //**************                                              ****************
+         Mines.c   142    //**************  Please do not change the following source.  ****************
+         Mines.c   143    //**************                                              ****************
+         Mines.c   144    //****************************************************************************
+         Mines.c   145    
+         Mines.c   146    
+         Mines.c   147    #pragma section _BR_Size
+         Mines.c   148    unsigned long BR_Size;
          Mines.c   149    #pragma section
          Mines.c   150    
-C   00000000              L361:
+         Mines.c   151    
+         Mines.c   152    #pragma section _TOP
+         Mines.c   153    
+         Mines.c   154    //****************************************************************************
+         Mines.c   155    //  InitializeSystem
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 01-Jan-2021 15:27:45  PAGE    8
+
+
+SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
+
+         Mines.c   156    //
+         Mines.c   157    //  param   :   isAppli   : 1 = Application / 0 = eActivity
+         Mines.c   158    //              OptionNum : Option Number (only eActivity)
+         Mines.c   159    //
+         Mines.c   160    //  retval  :   1 = No error / 0 = Error
+         Mines.c   161    //
+         Mines.c   162    //****************************************************************************
+         Mines.c   163    int InitializeSystem(int isAppli, unsigned short OptionNum)
+P_T 00000000              _InitializeSystem:               ; function: InitializeSystem
+                                                           ; frame size=0
+         Mines.c   164    {
+         Mines.c   165        return INIT_ADDIN_APPLICATION(isAppli, OptionNum);
+    00000000 D301                   MOV.L       L457+2,R3  ; _INIT_ADDIN_APPLICATION
+    00000002 432B                   JMP         @R3
+    00000004 0009                   NOP
+    00000006              L457:                             
+    00000006 0000                   .DATA.W     0
+    00000008 <00000000>             .DATA.L     _INIT_ADDIN_APPLICATION
+         Mines.c   166    }
+         Mines.c   167    
+         Mines.c   168    #pragma section
+         Mines.c   169    
+C   00000000              L367:
     00000000 5374617274             .SDATA      "Start Game"
              2047616D65   
     0000000A 0A                     .DATA.B     H'0A
@@ -438,7 +496,7 @@ C   00000000              L361:
     00000010 41626F7574             .SDATA      "About"
     00000015 00                     .DATA.B     H'00
     00000016 00000002               .RES.W      1
-    00000018              L362:
+    00000018              L368:
     00000018 3130202D20             .SDATA      "10 - Mines"
              4D696E6573   
     00000022 0A                     .DATA.B     H'0A
@@ -454,25 +512,25 @@ C   00000000              L361:
     00000044 00                     .DATA.B     H'00
     00000045 00000001               .RES.B      1
     00000046 00000002               .RES.W      1
-    00000048              L365:
+    00000048              L371:
     00000048 4E756D6265             .SDATA      "Number of mines:"
-
-
-
-
-SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 29-Dec-2020 02:38:20  PAGE    8
-
-
-SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
-
              72206F6620   
              6D696E6573   
              3A           
     00000058 00                     .DATA.B     H'00
     00000059 00000001               .RES.B      1
     0000005A 00000002               .RES.W      1
-    0000005C              L368:
+    0000005C              L374:
     0000005C 0A                     .DATA.B     H'0A
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 01-Jan-2021 15:27:45  PAGE    9
+
+
+SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
+
     0000005D 596F75206E             .SDATA      "You need at"
              6565642061   
              74           
@@ -482,7 +540,7 @@ SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
              6E652E       
     00000076 00                     .DATA.B     H'00
     00000077 00000001               .RES.B      1
-    00000078              L370:
+    00000078              L376:
     00000078 0A                     .DATA.B     H'0A
     00000079 596F752063             .SDATA      "You can only"
              616E206F6E   
@@ -493,6 +551,8 @@ SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
              6D696E6573   
              2E           
     00000096 00                     .DATA.B     H'00
+B   00000000              _millis:                         ; static: millis
+    00000000 00000004               .RES.L      1
 B_B 00000000              _BR_Size:                        ; static: BR_Size
     00000000 00000004               .RES.L      1
 
@@ -526,7 +586,13 @@ B_B 00000000              _BR_Size:                        ; static: BR_Size
 
 
 
-SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 29-Dec-2020 02:38:20  PAGE    1
+
+
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 01-Jan-2021 15:27:45  PAGE    1
 
 
 ******** STATISTICS INFORMATION ********
@@ -535,20 +601,20 @@ SH SERIES C/C++ Compiler (Ver. 6.0C)                                            
 ********** ERROR INFORMATION ***********
 
 NUMBER OF ERRORS:           0
-NUMBER OF WARNINGS:         0
+NUMBER OF WARNINGS:         1
 
 
 
 
 ******* SOURCE LINE INFORMATION ********
 
-COMPILED SOURCE LINE:      150
+COMPILED SOURCE LINE:      169
 
 
 
 ******* SECTION SIZE INFORMATION *******
 
-PROGRAM  SECTION (P):                               00000194 Byte(s)
+PROGRAM  SECTION (P):                               000001D4 Byte(s)
 PROGRAM  SECTION (P_BR_Size):                       00000000 Byte(s)
 PROGRAM  SECTION (P_TOP):                           0000000C Byte(s)
 CONSTANT SECTION (C):                               00000097 Byte(s)
@@ -557,19 +623,19 @@ CONSTANT SECTION (C_TOP):                           00000000 Byte(s)
 DATA     SECTION (D):                               00000000 Byte(s)
 DATA     SECTION (D_BR_Size):                       00000000 Byte(s)
 DATA     SECTION (D_TOP):                           00000000 Byte(s)
-BSS      SECTION (B):                               00000000 Byte(s)
+BSS      SECTION (B):                               00000004 Byte(s)
 BSS      SECTION (B_BR_Size):                       00000004 Byte(s)
 BSS      SECTION (B_TOP):                           00000000 Byte(s)
 
- TOTAL PROGRAM SIZE: 0000023B Byte(s)
+ TOTAL PROGRAM SIZE: 0000027F Byte(s)
 
 
 
 ********** LABEL INFORMATION ***********
 
-NUMBER OF EXTERNAL REFERENCE SYMBOLS:           14
-NUMBER OF EXTERNAL DEFINITION SYMBOLS:           3
-NUMBER OF INTERNAL/EXTERNAL SYMBOLS:            48
+NUMBER OF EXTERNAL REFERENCE SYMBOLS:           17
+NUMBER OF EXTERNAL DEFINITION SYMBOLS:           5
+NUMBER OF INTERNAL/EXTERNAL SYMBOLS:            54
 
 
 
@@ -595,5 +661,5 @@ NUMBER OF INTERNAL/EXTERNAL SYMBOLS:            48
 *** COMMAND PARAMETER ***
 
 
-  -subcommand=C:\DOCUME~1\milky\LOCALS~1\Temp\hmk3DE.tmp 
+  -subcommand=C:\DOCUME~1\milky\LOCALS~1\Temp\hmk589.tmp 
 

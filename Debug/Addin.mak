@@ -14,7 +14,7 @@ SH_EXEDIR=$(TCDIR)\bin
 
 # Hitachi SH C/C++ Compiler02 phase
 SHCC02_EXE=shc.exe
-SHCC02_DEP="$(OSDIR)\FX\include\fxlib.h" "Menu.h" "InfoTexts.h" "Game.h" "Digits.h" "Graphics.h"
+SHCC02_DEP="$(OSDIR)\FX\include\fxlib.h" "Menu.h" "InfoTexts.h" "Game.h" "Digits.h" "Graphics.h" "rand.h"
 
 # Hitachi SH Assembler03 phase
 SHASM03_EXE=asmsh.exe
@@ -44,8 +44,11 @@ FILEOBJ4="$(OUTDIR)\$(FILE4).obj"
 FILE5=Graphics
 FILESRC5="$(APPDIR)\$(FILE5).c"
 FILEOBJ5="$(OUTDIR)\$(FILE5).obj"
+FILE6=rand
+FILESRC6="$(APPDIR)\$(FILE6).c"
+FILEOBJ6="$(OUTDIR)\$(FILE6).obj"
 RFILE=FXADDINror
-USERALLOBJ=$(FILEOBJ0) $(FILEOBJ1) $(FILEOBJ2) $(FILEOBJ3) $(FILEOBJ4) $(FILEOBJ5)
+USERALLOBJ=$(FILEOBJ0) $(FILEOBJ1) $(FILEOBJ2) $(FILEOBJ3) $(FILEOBJ4) $(FILEOBJ5) $(FILEOBJ6)
 
 #######################
 # nmake "all" statement
@@ -165,6 +168,23 @@ $(FILEOBJ5) : $(FILESRC5) $(SHCC02_DEP)
 -chgincpath
 -errorpath
 $(FILESRC5)
+-lang=c
+-nologo
+-debug
+<<
+
+$(FILEOBJ6) : $(FILESRC6) $(SHCC02_DEP)
+	"$(SH_EXEDIR)\$(SHCC02_EXE)" -subcommand=<<
+-cpu=sh3
+-include="$(OSDIR)\FX\include","$(APPDIR)"
+-objectfile=$(FILEOBJ6)
+-show=source
+-listfile="$(OUTDIR)\$(FILE6).lst"
+-size
+-noinline
+-chgincpath
+-errorpath
+$(FILESRC6)
 -lang=c
 -nologo
 -debug

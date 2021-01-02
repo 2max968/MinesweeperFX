@@ -8,12 +8,12 @@ void DrawRect(int x, int y, int w, int h)
     for(i = 0; i < w; i++)
     {
         Bdisp_SetPoint_VRAM(x + i, y, 1);
-        Bdisp_SetPoint_VRAM(x + i, y + h, 1);
+        Bdisp_SetPoint_VRAM(x + i, y + h - 1, 1);
     }
     for(i = 1; i < h - 1; i++)
     {
         Bdisp_SetPoint_VRAM(x, y + i, 1);
-        Bdisp_SetPoint_VRAM(x + w, y + i, 1);
+        Bdisp_SetPoint_VRAM(x + w - 1, y + i, 1);
     }
 }
 

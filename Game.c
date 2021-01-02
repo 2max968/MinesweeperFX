@@ -166,8 +166,8 @@ void _placeMines(uchar* field, uchar freeX, uchar freeY, int mineCount)
 
     for(i = 0; i < mineCount;)
     {
-        x = rand() % FWIDTH;
-        y = rand() % FHEIGHT;
+        x = myrand() % FWIDTH;
+        y = myrand() % FHEIGHT;
         ind = indexOf(x, y);
         if((x != freeX || y != freeY) && !_isMined(x, y, field))
         {

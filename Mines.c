@@ -13,7 +13,9 @@
 #include "Game.h"
 #include "Mines.h"
 #include "Graphics.h"
+#include "timer.h"
 #include <stdio.h>
+#include "rand.h"
 
 #define STATE_MAINMENU 0
 #define STATE_DIFFMENU 1
@@ -23,6 +25,17 @@
 #define STATE_LOOSE 5
 #define STATE_WIN 6
 #define STATE_CUSTOMGAME 7
+#define STATE_MAINMENU2 8
+
+#define RTIMER SetTimer(ID_USER_TIMER1, 1, randomSeedTimer)
+#define KTIMER KillTimer(ID_USER_TIMER1)
+
+unsigned int millis;
+
+void randomSeedTimer()
+{
+	millis++;
+}
 
 int AddIn_main(int isAppli, unsigned short OptionNum)
 {
@@ -39,6 +52,9 @@ int AddIn_main(int isAppli, unsigned short OptionNum)
 		switch(state)
 		{
 		case STATE_MAINMENU:
+			state = STATE_MAINMENU2;
+			KTIMER;
+		case STATE_MAINMENU2:
 			FillDotted();
 			res = ShowMenu(0, "Start Game\nHelp\nAbout");
 			if(res == 0) state = STATE_DIFFMENU;
@@ -46,6 +62,7 @@ int AddIn_main(int isAppli, unsigned short OptionNum)
 			if(res == 2) state = STATE_ABOUT;
 			break;
 		case STATE_DIFFMENU:
+			RTIMER;
 			res = ShowMenu(1, "10 - Mines\n15 - Mines\n20 - Mines\nCustom Game");
 			if(res == -1) state = STATE_MAINMENU;
 			else
@@ -69,6 +86,8 @@ int AddIn_main(int isAppli, unsigned short OptionNum)
 			state = STATE_MAINMENU;
 			break;
 		case STATE_GAME:
+			KTIMER;
+			mysrand(millis);
 			gameResult = RunGame(difficulty);
 			if(gameResult == GAMEND_LOOSE)
 				state = STATE_LOOSE;

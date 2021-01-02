@@ -1,0 +1,137 @@
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 01-Jan-2021 15:17:23  PAGE    1
+
+************ OBJECT LISTING ************
+
+FILE NAME: E:\Entwicklung\Casio\SDK\Minesweeper\rand.c
+
+SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
+
+          rand.c     1    #include "rand.h"
+          rand.c     2    #include <stdlib.h>
+          rand.c     3    
+          rand.c     4    unsigned int _seed;
+          rand.c     5    
+          rand.c     6    unsigned int myrand()
+P   00000000              _myrand:                         ; function: myrand
+                                                           ; frame size=4
+    00000000 4F22                   STS.L       PR,@-R15
+          rand.c     7    {
+          rand.c     8        return (unsigned int)(rand() + _seed);
+    00000002 D305                   MOV.L       L259,R3    ; _rand
+    00000004 430B                   JSR         @R3
+    00000006 0009                   NOP
+    00000008 D304                   MOV.L       L259+4,R3  ; __seed
+    0000000A 6232                   MOV.L       @R3,R2
+          rand.c     9    }
+    0000000C 4F26                   LDS.L       @R15+,PR
+    0000000E 000B                   RTS
+    00000010 302C                   ADD         R2,R0
+          rand.c    10    
+          rand.c    11    void mysrand(unsigned int seed)
+    00000012              _mysrand:                        ; function: mysrand
+                                                           ; frame size=0
+          rand.c    12    {
+          rand.c    13        _seed = seed;
+    00000012 D102                   MOV.L       L259+4,R1  ; __seed
+          rand.c    14    }
+    00000014 000B                   RTS
+    00000016 2142                   MOV.L       R4,@R1
+    00000018              L259:                             
+    00000018 <00000000>             .DATA.L     _rand
+    0000001C <00000000>             .DATA.L     __seed
+B   00000000              __seed:                          ; static: _seed
+    00000000 00000004               .RES.L      1
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 01-Jan-2021 15:17:23  PAGE    1
+
+
+******** STATISTICS INFORMATION ********
+
+
+********** ERROR INFORMATION ***********
+
+NUMBER OF ERRORS:           0
+NUMBER OF WARNINGS:         0
+
+
+
+
+******* SOURCE LINE INFORMATION ********
+
+COMPILED SOURCE LINE:       14
+
+
+
+******* SECTION SIZE INFORMATION *******
+
+PROGRAM  SECTION (P):                               00000020 Byte(s)
+CONSTANT SECTION (C):                               00000000 Byte(s)
+DATA     SECTION (D):                               00000000 Byte(s)
+BSS      SECTION (B):                               00000004 Byte(s)
+
+ TOTAL PROGRAM SIZE: 00000024 Byte(s)
+
+
+
+********** LABEL INFORMATION ***********
+
+NUMBER OF EXTERNAL REFERENCE SYMBOLS:            1
+NUMBER OF EXTERNAL DEFINITION SYMBOLS:           3
+NUMBER OF INTERNAL/EXTERNAL SYMBOLS:             5
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+*** COMMAND PARAMETER ***
+
+
+  -subcommand=C:\DOCUME~1\milky\LOCALS~1\Temp\hmk587.tmp 
+
